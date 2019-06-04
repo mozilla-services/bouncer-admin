@@ -3,6 +3,7 @@ from flask_mysqldb import MySQL
 import mysql.connector
 import xmlrenderer
 
+
 class MySQLModel:
     def __init__(self, flask_app):
         self._app = flask_app
