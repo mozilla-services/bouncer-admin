@@ -296,6 +296,52 @@ class MySQLModel:
 
         xml.prepare_mirrors(mirrors)
         return xml.render(), True
+    
+    def uptake(self, product, os, fuzzy):
+        xml = xmlrenderer.XMLRenderer()
+
+        if product is None and os is None:
+            return xml.error('product and/or os are required GET parameters.', errno=101), False
+        
+        db = mysql.connector.connect(user='root', host='127.0.0.1', database='bouncer')
+        cur = db.cursor()
+
+        product_names=None
+        if product:
+            if fuzzy:
+                sql = '''SELECT name FROM mirror_products WHERE name LIKE %s;'''
+                product = '%' + product + '%'
+            else:
+                sql = '''SELECT name FROM mirror_products WHERE name = %s;'''
+
+            cur.execute(sql, (product,))
+
+            res = cur.fetchall()
+            product_names = [line[0] for line in res]
+            if not product_names:
+                return xml.error('No products found', errno=102), False
+
+        os_names=None
+        if os:
+            if fuzzy:
+                sql = '''SELECT name FROM mirror_os WHERE name LIKE %s;'''
+                os = '%' + os + '%'
+            else:
+                sql = '''SELECT name FROM mirror_os WHERE name = %s;'''
+
+            cur.execute(sql, (os,))
+
+            res = cur.fetchall()
+            os_names = [line[0] for line in res]
+            if not os_names:
+                return xml.error('No OSes found', errno=102), False
+        
+        cur.close()
+        db.close()
+        
+        xml.prepare_uptake_fake(products=product_names, oses=os_names)
+        return xml.render(), True
+
 
     def os_exists(self, os):
         sql = '''SELECT id FROM mirror_os WHERE name=%s;'''

@@ -93,7 +93,7 @@ class XMLRenderer(object):
         self.doc.appendChild(root)
         for row in uptake:
             item = self.doc.createElement('item')
-            for key, value in content_map.iteritems():
+            for key, value in content_map.items():
                 elem = self.doc.createElement(key)
                 elem.appendChild(self.doc.createTextNode(str(row[value])))
                 item.appendChild(elem)

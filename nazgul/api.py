@@ -96,4 +96,6 @@ def uptake():
     product = request.args.get('product')
     os = request.args.get('os')
     fuzzy = request.args.get('fuzzy') == 'True'
-    return ':('
+
+    data, success = msm.uptake(product, os, fuzzy)
+    return Response(data, mimetype='text/xml'), 200 if success else 400
