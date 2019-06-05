@@ -1,13 +1,13 @@
 from flask import Flask, render_template, request
 from flask_mysqldb import MySQL
 import mysql.connector
-import xmlrenderer
+import nazgul.xmlrenderer as xmlrenderer
 
 
 class MySQLModel:
-    def __init__(self, flask_app):
-        self._app = flask_app
-    
+    def __init__(self):
+        pass
+
     def index(self):
         return "Welcome to Nazgul"
     
