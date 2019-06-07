@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request, Response, Blueprint
 from flask_mysqldb import MySQL
 from nazgul.mysql_model import MySQLModel
+import urllib.parse
+import ast
 
 bp = Blueprint('api', __name__, url_prefix='/api')
 
@@ -30,13 +32,13 @@ def location_modify():
     product = request.form.get('product', None)
     os = request.form.get('os', None)
     path = request.form.get('path', None)
-    return Response(msm.location_modify(product, os, path), mimetype='text/xml')
+    data, success = msm.location_modify(product, os, path)
+    return Response(data, mimetype='text/xml'), 200 if success else 400 
 
 @bp.route('/location_delete', methods=['POST'])
 def location_delete():
-    product = request.form.get('product', None)
-    os = request.form.get('os', None)
-    data, success = msm.location_delete(product, os)
+    location_id = request.form.get('location_id', None)
+    data, success = msm.location_delete(location_id)
     return Response(data, mimetype='text/xml'), 200 if success else 400 
 
 @bp.route('/product_show', methods=['GET'])
@@ -50,7 +52,8 @@ def product_show():
 @bp.route('/product_add', methods=['POST'])
 def product_add():
     product = request.form.get('product', None)
-    languages = request.form.get('languages', None)
+    lang_in = request.form.get('languages', None)
+    languages = ast.literal_eval(urllib.parse.unquote(lang_in))
     ssl_only = request.form.get('ssl_only') == 'True'
     data, success = msm.product_add(product, languages, ssl_only)
     return Response(data, mimetype='text/xml'), 200 if success else 400 
@@ -73,7 +76,8 @@ def product_delete():
 @bp.route('/product_language_add', methods=['POST'])
 def product_language_add():
     product = request.form.get('product', None)
-    languages = request.form.get('languages', None)
+    lang_in = request.form.get('languages', None)
+    languages = ast.literal_eval(urllib.parse.unquote(lang_in))
     data, success = msm.product_language_add(product, languages)
     return Response(data, mimetype='text/xml'), 200 if success else 400 
 
@@ -81,7 +85,8 @@ def product_language_add():
 @bp.route('/product_language_delete', methods=['POST'])
 def product_language_delete():
     product = request.form.get('product', None)
-    languages = request.form.get('languages', None)
+    lang_in = request.form.get('languages', None)
+    languages = ast.literal_eval(urllib.parse.unquote(lang_in))
     data, success = msm.product_language_delete(product, languages)
     return Response(data, mimetype='text/xml'), 200 if success else 400
 

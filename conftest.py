@@ -4,7 +4,6 @@ import tempfile
 import pytest
 
 import sys,os
-sys.path.append(os.path.join(os.path.dirname(__file__),os.pardir,"bouncer-admin"))
 from nazgul import create_app
 
 @pytest.fixture
