@@ -179,3 +179,19 @@ def test_product_language_delete_no_match(client):
     expected = b'<?xml version="1.0" encoding="utf-8"?><error number="102">Product not found.</error>'
     assert expected == rv.data
 
+def test_create_update_alias_no_product_match(client):
+    rv = client.post('api/create_update_alias', data={'alias': 'aaron-product', 'related_product': 'FakeProduct'})
+    expected = b'<?xml version="1.0" encoding="utf-8"?><error number="103">You must specify a valid product to match with an alias</error>'
+    assert expected == rv.data
+
+def test_create_update_alias_alias_product_name_collision(client):
+    rv = client.post('api/create_update_alias', data={'alias': 'Firefox', 'related_product': 'AaronProduct'})
+    expected = b'<?xml version="1.0" encoding="utf-8"?><error number="104">You cannot create an alias with the same name as a product</error>'
+    assert expected == rv.data
+
+def test_create_update_alias(client):
+    rv = client.post('api/create_update_alias', data={'alias': 'aaron-product', 'related_product': 'AaronProduct'})
+    expected = b'<?xml version="1.0" encoding="utf-8"?><success>Created/updated alias aaron-product</success>'
+    msm._reset_db()
+    assert expected == rv.data
+

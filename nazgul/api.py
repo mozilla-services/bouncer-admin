@@ -104,3 +104,11 @@ def uptake():
 
     data, success = msm.uptake(product, os, fuzzy)
     return Response(data, mimetype='text/xml'), 200 if success else 400
+
+@bp.route('/create_update_alias', methods=['POST'])
+def create_update_alias():
+    alias = request.form.get('alias', None)
+    related_product = request.form.get('related_product', None)
+
+    data, success = msm.create_update_alias(alias, related_product)
+    return Response(data, mimetype='text/xml'), 200 if success else 400

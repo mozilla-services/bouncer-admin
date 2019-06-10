@@ -342,6 +342,37 @@ class MySQLModel:
         xml.prepare_uptake_fake(products=product_names, oses=os_names)
         return xml.render(), True
 
+    def create_update_alias(self, alias, related_product):
+        xml = xmlrenderer.XMLRenderer()
+
+        if not alias:
+            return xml.error('Alias name not provided', errno=102), False
+        if not related_product:
+            return xml.error('Related product name not provided', errno=103), False
+        product_exists, product_id = self.product_exists(related_product)
+        if not product_exists:
+            return xml.error('You must specify a valid product to match with an alias', errno=103), False
+        alias_name_match, product_id = self.product_exists(alias)
+        if alias_name_match:
+            return xml.error('You cannot create an alias with the same name as a product', errno=104), False
+
+        alias_exists, alias_id = self.alias_exists(alias)
+        
+        db = mysql.connector.connect(user='root', host=self._host, database='bouncer')
+        cur = db.cursor()
+        if alias_exists:
+            sql = '''UPDATE mirror_aliases SET related_product=%s WHERE alias=%s'''
+            cur.execute(sql, (related_product, alias))
+        else:
+            sql = '''INSERT INTO mirror_aliases (alias, related_product) VALUES (%s, %s)'''
+            cur.execute(sql, (alias, related_product))
+
+        db.commit()
+
+        cur.close()
+        db.close()
+
+        return xml.success('Created/updated alias ' + alias), True
 
     def os_exists(self, os):
         sql = '''SELECT id FROM mirror_os WHERE name=%s;'''
@@ -378,11 +409,28 @@ class MySQLModel:
             return False, []
     
     def location_exists(self, os, product):
-        sql = '''SELECT * FROM mirror_locations ml JOIN mirror_os mo ON ml.os_id=mo.id JOIN mirror_products mp ON ml.product_id=mp.id WHERE mo.name=%s AND mp.name=%s;'''
+        sql = '''SELECT ml.id FROM mirror_locations ml JOIN mirror_os mo ON ml.os_id=mo.id JOIN mirror_products mp ON ml.product_id=mp.id WHERE mo.name=%s AND mp.name=%s;'''
 
         db = mysql.connector.connect(user='root', host=self._host, database='bouncer')
         cur = db.cursor()
         cur.execute(sql, (os, product))
+
+        res = cur.fetchall()
+
+        cur.close()
+        db.close()
+
+        if len(res) > 0:
+            return True, res[0][0]
+        else:
+            return False, []
+
+    def alias_exists(self, alias):
+        sql = '''SELECT id FROM mirror_aliases WHERE alias=%s;'''
+
+        db = mysql.connector.connect(user='root', host=self._host, database='bouncer')
+        cur = db.cursor()
+        cur.execute(sql, (alias,))
 
         res = cur.fetchall()
 
