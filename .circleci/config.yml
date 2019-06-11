@@ -41,12 +41,19 @@ jobs:
 
   test:
     docker:
-      - image: app:build
+      - image: docker:18.02.0-ce
       - image: circleci/mysql:5.6-ram
     steps:
+      - setup_remote_docker
+      - restore_cache:
+          key: v1-{{.Branch}}
+      - run:
+          name: Restore Docker image cache
+          command: docker load -i /cache/docker.tar
+
       - run:
           name: Test Code
-          command: pytest -vv
+          command: docker run -e DATABASE_URL=localhost app:build pytest -vv
 
   deploy:
     docker:
