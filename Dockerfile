@@ -10,5 +10,6 @@ EXPOSE 5000
 
 ENV FLASK_APP nazgul.py
 ENV FLASK_ENV production
+ENV DATABASE_URL=host.docker.internal
 
 CMD ["python3", "nazgul/api.py"]

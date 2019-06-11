@@ -1,8 +1,11 @@
 import pytest
 import requests
 from nazgul import create_app, mysql_model
+import os
 
-msm = mysql_model.MySQLModel()
+test_db = os.environ.get('DATABASE_URL', '127.0.0.1')
+msm = mysql_model.MySQLModel(host=test_db)
+msm._reset_db()
 
 def test_location_show_exact_match(client):
     rv = client.get('/api/location_show?product=Firefox')

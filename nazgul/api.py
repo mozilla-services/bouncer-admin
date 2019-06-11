@@ -5,10 +5,12 @@ except:
     from mysql_model import MySQLModel
 import urllib.parse
 import ast
+import os
 
 bp = Blueprint('api', __name__, url_prefix='/api')
 
-msm = MySQLModel()
+test_db = os.environ.get('DATABASE_URL', '127.0.0.1')
+msm = MySQLModel(host=test_db)
 
 @bp.route('/', methods=['GET', 'POST'])
 def index():
@@ -118,6 +120,5 @@ def create_update_alias():
 if __name__ == '__main__':
     app = Flask(__name__, instance_relative_config=True)
     app.register_blueprint(bp)
-    msm = MySQLModel(host='host.docker.internal')
     app.run(host='0.0.0.0', port=5000)
     

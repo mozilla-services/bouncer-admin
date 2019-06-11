@@ -7,9 +7,11 @@ except:
 
 
 class MySQLModel:
-    def __init__(self, user='root', host='127.0.0.1'):
+    def __init__(self, user='root', host='127.0.0.1', password='', db='bouncer'):
         self._user = user
         self._host = host
+        self._pass = password
+        self._db   = db
 
     def index(self):
         return "Welcome to Nazgul"
@@ -25,7 +27,7 @@ class MySQLModel:
         else:
             sql = '''SELECT distinct id FROM mirror_products WHERE name = %s;'''
 
-        db = mysql.connector.connect(user='root', host=self._host, database='bouncer')
+        db = mysql.connector.connect(user='root', host=self._host, database=self._db)
         cur = db.cursor()
         cur.execute(sql, (product,))
 
@@ -63,7 +65,7 @@ class MySQLModel:
         
         sql = '''INSERT INTO mirror_locations (product_id, os_id, path) VALUES (%s,%s,%s)'''
 
-        db = mysql.connector.connect(user='root', host=self._host, database='bouncer')
+        db = mysql.connector.connect(user='root', host=self._host, database=self._db)
         cur = db.cursor()
         cur.execute(sql, (product_id, os_id, path))
 
@@ -95,7 +97,7 @@ class MySQLModel:
         
         sql = '''UPDATE mirror_locations SET path=%s WHERE os_id=%s AND product_id=%s'''
 
-        db = mysql.connector.connect(user='root', host=self._host, database='bouncer')
+        db = mysql.connector.connect(user='root', host=self._host, database=self._db)
         cur = db.cursor()
         cur.execute(sql, (path, os_id, product_id))
 
@@ -119,7 +121,7 @@ class MySQLModel:
         
         sql = '''DELETE FROM mirror_locations WHERE id=%s'''
 
-        db = mysql.connector.connect(user='root', host=self._host, database='bouncer')
+        db = mysql.connector.connect(user='root', host=self._host, database=self._db)
         cur = db.cursor()
         cur.execute(sql, (location_id,))
 
@@ -139,7 +141,7 @@ class MySQLModel:
         else:
             sql = '''SELECT id FROM mirror_products WHERE name = %s;'''
 
-        db = mysql.connector.connect(user='root', host=self._host, database='bouncer')
+        db = mysql.connector.connect(user='root', host=self._host, database=self._db)
         cur = db.cursor()
         cur.execute(sql, (product,))
 
@@ -164,7 +166,7 @@ class MySQLModel:
         
         sql = '''INSERT INTO mirror_products (name, ssl_only) VALUES (%s, %s)'''
 
-        db = mysql.connector.connect(user='root', host=self._host, database='bouncer')
+        db = mysql.connector.connect(user='root', host=self._host, database=self._db)
         cur = db.cursor()
         cur.execute(sql, (product, int(ssl_only)))
         db.commit()
@@ -190,7 +192,7 @@ class MySQLModel:
             return xml.error('No product found.', errno=102), False
 
 
-        db = mysql.connector.connect(user='root', host=self._host, database='bouncer')
+        db = mysql.connector.connect(user='root', host=self._host, database=self._db)
         cur = db.cursor()
 
         sql = '''DELETE FROM mirror_products WHERE id=%s'''
@@ -212,7 +214,7 @@ class MySQLModel:
     def product_delete_id(self, id):
         xml = xmlrenderer.XMLRenderer()
 
-        db = mysql.connector.connect(user='root', host=self._host, database='bouncer')
+        db = mysql.connector.connect(user='root', host=self._host, database=self._db)
         cur = db.cursor()
 
         sql = '''DELETE FROM mirror_products WHERE id=%s'''
@@ -238,7 +240,7 @@ class MySQLModel:
         if(not product_exists):
             return xml.error('Product not found.', errno=102), False
 
-        db = mysql.connector.connect(user='root', host=self._host, database='bouncer')
+        db = mysql.connector.connect(user='root', host=self._host, database=self._db)
         cur = db.cursor()
 
         for lang in languages:
@@ -260,7 +262,7 @@ class MySQLModel:
         if(not product_exists):
             return xml.error('Product not found.', errno=102), False
         
-        db = mysql.connector.connect(user='root', host=self._host, database='bouncer')
+        db = mysql.connector.connect(user='root', host=self._host, database=self._db)
         cur = db.cursor()
 
         if languages[0] == '*':
@@ -281,7 +283,7 @@ class MySQLModel:
     def mirror_list(self):
         xml = xmlrenderer.XMLRenderer()
 
-        db = mysql.connector.connect(user='root', host=self._host, database='bouncer')
+        db = mysql.connector.connect(user='root', host=self._host, database=self._db)
         cur = db.cursor()
 
         sql = '''SELECT baseurl FROM mirror_mirrors WHERE active=1'''
@@ -305,7 +307,7 @@ class MySQLModel:
         if product is None and os is None:
             return xml.error('product and/or os are required GET parameters.', errno=101), False
         
-        db = mysql.connector.connect(user='root', host=self._host, database='bouncer')
+        db = mysql.connector.connect(user='root', host=self._host, database=self._db)
         cur = db.cursor()
 
         product_names=None
@@ -360,7 +362,7 @@ class MySQLModel:
 
         alias_exists, alias_id = self.alias_exists(alias)
 
-        db = mysql.connector.connect(user='root', host=self._host, database='bouncer')
+        db = mysql.connector.connect(user='root', host=self._host, database=self._db)
         cur = db.cursor()
         if alias_exists:
             sql = '''UPDATE mirror_aliases SET related_product=%s WHERE alias=%s'''
@@ -379,7 +381,7 @@ class MySQLModel:
     def os_exists(self, os):
         sql = '''SELECT id FROM mirror_os WHERE name=%s;'''
 
-        db = mysql.connector.connect(user='root', host=self._host, database='bouncer')
+        db = mysql.connector.connect(user='root', host=self._host, database=self._db)
         cur = db.cursor()
         cur.execute(sql, (os,))
 
@@ -396,7 +398,7 @@ class MySQLModel:
     def product_exists(self, product):
         sql = '''SELECT id FROM mirror_products WHERE name=%s;'''
 
-        db = mysql.connector.connect(user='root', host=self._host, database='bouncer')
+        db = mysql.connector.connect(user='root', host=self._host, database=self._db)
         cur = db.cursor()
         cur.execute(sql, (product,))
 
@@ -413,7 +415,7 @@ class MySQLModel:
     def location_exists(self, os, product):
         sql = '''SELECT ml.id FROM mirror_locations ml JOIN mirror_os mo ON ml.os_id=mo.id JOIN mirror_products mp ON ml.product_id=mp.id WHERE mo.name=%s AND mp.name=%s;'''
 
-        db = mysql.connector.connect(user='root', host=self._host, database='bouncer')
+        db = mysql.connector.connect(user='root', host=self._host, database=self._db)
         cur = db.cursor()
         cur.execute(sql, (os, product))
 
@@ -430,7 +432,7 @@ class MySQLModel:
     def alias_exists(self, alias):
         sql = '''SELECT id FROM mirror_aliases WHERE alias=%s;'''
 
-        db = mysql.connector.connect(user='root', host=self._host, database='bouncer')
+        db = mysql.connector.connect(user='root', host=self._host, database=self._db)
         cur = db.cursor()
         cur.execute(sql, (alias,))
 
@@ -447,7 +449,7 @@ class MySQLModel:
     def location_id_valid(self, location_id):
         sql = '''SELECT id FROM mirror_locations WHERE id=%s;'''
 
-        db = mysql.connector.connect(user='root', host=self._host, database='bouncer')
+        db = mysql.connector.connect(user='root', host=self._host, database=self._db)
         cur = db.cursor()
         cur.execute(sql, (location_id,))
 
@@ -461,7 +463,7 @@ class MySQLModel:
     def get_products_info(self, ids):
         sql = '''SELECT mp.id, mp.name, mpl.language FROM mirror_products mp JOIN mirror_product_langs mpl ON mp.id=mpl.product_id WHERE mp.id=%s'''
 
-        db = mysql.connector.connect(user='root', host=self._host, database='bouncer')
+        db = mysql.connector.connect(user='root', host=self._host, database=self._db)
         cur = db.cursor()
         products = []
         for id in ids:
@@ -483,7 +485,7 @@ class MySQLModel:
     def get_locations_info(self, ids):
         sql = '''SELECT ml.id, ml.product_id, mp.name, path, mo.name FROM mirror_locations ml JOIN mirror_products mp ON ml.product_id=mp.id JOIN mirror_os mo ON mo.id=ml.os_id WHERE mp.id=%s'''
 
-        db = mysql.connector.connect(user='root', host=self._host, database='bouncer')
+        db = mysql.connector.connect(user='root', host=self._host, database=self._db)
         cur = db.cursor()
         products = []
         for id in ids:
@@ -504,7 +506,7 @@ class MySQLModel:
     
     ''' TEST HELPER FUNCTIONS '''
     def _reset_db(self):
-        db = mysql.connector.connect(user='root', host=self._host, database='bouncer')
+        db = mysql.connector.connect(user='root', host=self._host, database=self._db)
         cur = db.cursor()
 
         for line in open('data.sql'):
