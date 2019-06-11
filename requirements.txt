@@ -1,0 +1,5 @@
+pytest==4.6.2
+Flask==1.0.2
+requests==2.22.0
+mysql-connector-python==8.0.16
+urllib3==1.25.2

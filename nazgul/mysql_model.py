@@ -1,7 +1,9 @@
 from flask import Flask, render_template, request
-from flask_mysqldb import MySQL
 import mysql.connector
-import nazgul.xmlrenderer as xmlrenderer
+try:
+    import nazgul.xmlrenderer as xmlrenderer
+except:
+    import xmlrenderer
 
 
 class MySQLModel:
@@ -357,7 +359,7 @@ class MySQLModel:
             return xml.error('You cannot create an alias with the same name as a product', errno=104), False
 
         alias_exists, alias_id = self.alias_exists(alias)
-        
+
         db = mysql.connector.connect(user='root', host=self._host, database='bouncer')
         cur = db.cursor()
         if alias_exists:

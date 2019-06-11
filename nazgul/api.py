@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request, Response, Blueprint
-from flask_mysqldb import MySQL
-from nazgul.mysql_model import MySQLModel
+try:
+    from nazgul.mysql_model import MySQLModel
+except:
+    from mysql_model import MySQLModel
 import urllib.parse
 import ast
 
@@ -112,3 +114,10 @@ def create_update_alias():
 
     data, success = msm.create_update_alias(alias, related_product)
     return Response(data, mimetype='text/xml'), 200 if success else 400
+
+if __name__ == '__main__':
+    app = Flask(__name__, instance_relative_config=True)
+    app.register_blueprint(bp)
+    msm = MySQLModel(host='host.docker.internal')
+    app.run(host='0.0.0.0', port=5000)
+    
