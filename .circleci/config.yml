@@ -41,19 +41,17 @@ jobs:
 
   test:
     docker:
-      - image: docker:18.02.0-ce
+      - image: circleci/python:3.7
       - image: circleci/mysql:5.6-ram
+        environment:
+          MYSQL_DATABASE: circle_test
     steps:
-      - setup_remote_docker
-      - restore_cache:
-          key: v1-{{.Branch}}
-      - run:
-          name: Restore Docker image cache
-          command: docker load -i /cache/docker.tar
-
       - run:
           name: Test Code
-          command: docker run -e DATABASE_URL=localhost app:build pytest -vv
+          command: |
+            pip3 install --no-cache -r /python_requirements.txt
+            pytest -vv
+
 
   deploy:
     docker:
