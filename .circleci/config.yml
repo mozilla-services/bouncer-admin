@@ -61,7 +61,7 @@ jobs:
       - run:
           name: Test Code
           command: |
-            pip3 install --no-cache -r requirements.txt
+            sudo pip3 install --no-cache -r requirements.txt
             pytest -vv
 
 
