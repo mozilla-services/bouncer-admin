@@ -53,7 +53,7 @@ jobs:
 
       - run:
           name: Test Code
-          command: docker run -e DATABASE_URL=localhost nazgul:latest pytest -vv
+          command: docker run -e DATABASE_URL=localhost app:build pytest -vv
 
   deploy:
     docker:
