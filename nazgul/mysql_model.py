@@ -8,10 +8,12 @@ except:
 
 class MySQLModel:
     def __init__(self, user='root', host='127.0.0.1', password='', db='bouncer'):
+        self._pass = password
         self._user = user
         self._host = host
-        self._pass = password
-        self._db   = db
+        self._db_name = db
+        # TODO: Should I have autocommit always True?
+        self._db = mysql.connector.connect(user=user, host=host, database=db, autocommit=True)
 
     def index(self):
         return "Welcome to Nazgul"
@@ -27,14 +29,12 @@ class MySQLModel:
         else:
             sql = '''SELECT distinct id FROM mirror_products WHERE name = %s;'''
 
-        db = mysql.connector.connect(user='root', host=self._host, database=self._db)
-        cur = db.cursor()
+        cur = self._db.cursor()
         cur.execute(sql, (product,))
 
         res = cur.fetchall()
 
         cur.close()
-        db.close()
 
         ids = []
         for line in res:
@@ -65,14 +65,12 @@ class MySQLModel:
         
         sql = '''INSERT INTO mirror_locations (product_id, os_id, path) VALUES (%s,%s,%s)'''
 
-        db = mysql.connector.connect(user='root', host=self._host, database=self._db)
-        cur = db.cursor()
+        cur = self._db.cursor()
         cur.execute(sql, (product_id, os_id, path))
 
-        db.commit()
+        self._db.commit()
 
         cur.close()
-        db.close()
 
 
         products = self.get_locations_info([product_id])
@@ -97,14 +95,12 @@ class MySQLModel:
         
         sql = '''UPDATE mirror_locations SET path=%s WHERE os_id=%s AND product_id=%s'''
 
-        db = mysql.connector.connect(user='root', host=self._host, database=self._db)
-        cur = db.cursor()
+        cur = self._db.cursor()
         cur.execute(sql, (path, os_id, product_id))
 
-        db.commit()
+        self._db.commit()
 
         cur.close()
-        db.close()
 
         products = self.get_locations_info([product_id])
         for p in products:
@@ -121,14 +117,12 @@ class MySQLModel:
         
         sql = '''DELETE FROM mirror_locations WHERE id=%s'''
 
-        db = mysql.connector.connect(user='root', host=self._host, database=self._db)
-        cur = db.cursor()
+        cur = self._db.cursor()
         cur.execute(sql, (location_id,))
 
-        db.commit()
+        self._db.commit()
 
         cur.close()
-        db.close()
 
         return xml.success('SUCCESS: location has been deleted'), True
     
@@ -141,14 +135,12 @@ class MySQLModel:
         else:
             sql = '''SELECT id FROM mirror_products WHERE name = %s;'''
 
-        db = mysql.connector.connect(user='root', host=self._host, database=self._db)
-        cur = db.cursor()
+        cur = self._db.cursor()
         cur.execute(sql, (product,))
 
         res = cur.fetchall()
 
         cur.close()
-        db.close()
 
         ids = []
         for line in res:
@@ -166,20 +158,18 @@ class MySQLModel:
         
         sql = '''INSERT INTO mirror_products (name, ssl_only) VALUES (%s, %s)'''
 
-        db = mysql.connector.connect(user='root', host=self._host, database=self._db)
-        cur = db.cursor()
+        cur = self._db.cursor()
         cur.execute(sql, (product, int(ssl_only)))
-        db.commit()
+        self._db.commit()
 
         product_exists, product_id = self.product_exists(product)
         for lang in languages:
             sql = '''INSERT INTO mirror_product_langs (product_id, language) VALUES (%s, %s)'''
             cur.execute(sql, (product_id, lang))
 
-        db.commit()
+        self._db.commit()
 
         cur.close()
-        db.close()
 
         xml.prepare_products(self.get_products_info([product_id]))
         return xml.render(), True
@@ -192,8 +182,7 @@ class MySQLModel:
             return xml.error('No product found.', errno=102), False
 
 
-        db = mysql.connector.connect(user='root', host=self._host, database=self._db)
-        cur = db.cursor()
+        cur = self._db.cursor()
 
         sql = '''DELETE FROM mirror_products WHERE id=%s'''
         cur.execute(sql, (product_id,))
@@ -204,18 +193,16 @@ class MySQLModel:
         sql = '''DELETE FROM mirror_locations WHERE product_id=%s'''
         cur.execute(sql, (product_id,))
 
-        db.commit()
+        self._db.commit()
 
         cur.close()
-        db.close()
 
         return xml.success('SUCCESS: product has been deleted'), True
 
     def product_delete_id(self, id):
         xml = xmlrenderer.XMLRenderer()
 
-        db = mysql.connector.connect(user='root', host=self._host, database=self._db)
-        cur = db.cursor()
+        cur = self._db.cursor()
 
         sql = '''DELETE FROM mirror_products WHERE id=%s'''
         cur.execute(sql, (id,))
@@ -226,10 +213,9 @@ class MySQLModel:
         sql = '''DELETE FROM mirror_locations WHERE product_id=%s'''
         cur.execute(sql, (id,))
 
-        db.commit()
+        self._db.commit()
 
         cur.close()
-        db.close()
 
         return xml.success('SUCCESS: product has been deleted'), True
     
@@ -240,17 +226,15 @@ class MySQLModel:
         if(not product_exists):
             return xml.error('Product not found.', errno=102), False
 
-        db = mysql.connector.connect(user='root', host=self._host, database=self._db)
-        cur = db.cursor()
+        cur = self._db.cursor()
 
         for lang in languages:
             sql = '''INSERT INTO mirror_product_langs (product_id, language) VALUES (%s, %s)'''
             cur.execute(sql, (product_id, lang))
 
-        db.commit()
+        self._db.commit()
 
         cur.close()
-        db.close()
 
         xml.prepare_products(self.get_products_info([product_id]))
         return xml.render(), True
@@ -262,8 +246,7 @@ class MySQLModel:
         if(not product_exists):
             return xml.error('Product not found.', errno=102), False
         
-        db = mysql.connector.connect(user='root', host=self._host, database=self._db)
-        cur = db.cursor()
+        cur = self._db.cursor()
 
         if languages[0] == '*':
             sql = '''DELETE FROM mirror_product_langs WHERE product_id=%s'''
@@ -273,18 +256,16 @@ class MySQLModel:
                 sql = '''DELETE FROM mirror_product_langs WHERE product_id=%s AND language=%s'''
                 cur.execute(sql, (product_id, lang))
         
-        db.commit()
+        self._db.commit()
 
         cur.close()
-        db.close()
 
         return xml.success('SUCCESS: language has been deleted'), True
 
     def mirror_list(self):
         xml = xmlrenderer.XMLRenderer()
 
-        db = mysql.connector.connect(user='root', host=self._host, database=self._db)
-        cur = db.cursor()
+        cur = self._db.cursor()
 
         sql = '''SELECT baseurl FROM mirror_mirrors WHERE active=1'''
         cur.execute(sql)
@@ -296,7 +277,6 @@ class MySQLModel:
             mirrors.append({'baseurl': line[0]})
 
         cur.close()
-        db.close()
 
         xml.prepare_mirrors(mirrors)
         return xml.render(), True
@@ -307,8 +287,7 @@ class MySQLModel:
         if product is None and os is None:
             return xml.error('product and/or os are required GET parameters.', errno=101), False
         
-        db = mysql.connector.connect(user='root', host=self._host, database=self._db)
-        cur = db.cursor()
+        cur = self._db.cursor()
 
         product_names=None
         if product:
@@ -341,7 +320,6 @@ class MySQLModel:
                 return xml.error('No OSes found', errno=102), False
         
         cur.close()
-        db.close()
         
         xml.prepare_uptake_fake(products=product_names, oses=os_names)
         return xml.render(), True
@@ -362,8 +340,7 @@ class MySQLModel:
 
         alias_exists, alias_id = self.alias_exists(alias)
 
-        db = mysql.connector.connect(user='root', host=self._host, database=self._db)
-        cur = db.cursor()
+        cur = self._db.cursor()
         if alias_exists:
             sql = '''UPDATE mirror_aliases SET related_product=%s WHERE alias=%s'''
             cur.execute(sql, (related_product, alias))
@@ -371,24 +348,21 @@ class MySQLModel:
             sql = '''INSERT INTO mirror_aliases (alias, related_product) VALUES (%s, %s)'''
             cur.execute(sql, (alias, related_product))
 
-        db.commit()
+        self._db.commit()
 
         cur.close()
-        db.close()
 
         return xml.success('Created/updated alias ' + alias), True
 
     def os_exists(self, os):
         sql = '''SELECT id FROM mirror_os WHERE name=%s;'''
 
-        db = mysql.connector.connect(user='root', host=self._host, database=self._db)
-        cur = db.cursor()
+        cur = self._db.cursor()
         cur.execute(sql, (os,))
 
         res = cur.fetchall()
 
         cur.close()
-        db.close()
 
         if len(res) > 0:
             return True, res[0][0]
@@ -398,14 +372,12 @@ class MySQLModel:
     def product_exists(self, product):
         sql = '''SELECT id FROM mirror_products WHERE name=%s;'''
 
-        db = mysql.connector.connect(user='root', host=self._host, database=self._db)
-        cur = db.cursor()
+        cur = self._db.cursor()
         cur.execute(sql, (product,))
 
         res = cur.fetchall()
 
         cur.close()
-        db.close()
 
         if len(res) > 0:
             return True, res[0][0]
@@ -415,14 +387,12 @@ class MySQLModel:
     def location_exists(self, os, product):
         sql = '''SELECT ml.id FROM mirror_locations ml JOIN mirror_os mo ON ml.os_id=mo.id JOIN mirror_products mp ON ml.product_id=mp.id WHERE mo.name=%s AND mp.name=%s;'''
 
-        db = mysql.connector.connect(user='root', host=self._host, database=self._db)
-        cur = db.cursor()
+        cur = self._db.cursor()
         cur.execute(sql, (os, product))
 
         res = cur.fetchall()
 
         cur.close()
-        db.close()
 
         if len(res) > 0:
             return True, res[0][0]
@@ -432,14 +402,12 @@ class MySQLModel:
     def alias_exists(self, alias):
         sql = '''SELECT id FROM mirror_aliases WHERE alias=%s;'''
 
-        db = mysql.connector.connect(user='root', host=self._host, database=self._db)
-        cur = db.cursor()
+        cur = self._db.cursor()
         cur.execute(sql, (alias,))
 
         res = cur.fetchall()
 
         cur.close()
-        db.close()
 
         if len(res) > 0:
             return True, res[0][0]
@@ -449,22 +417,19 @@ class MySQLModel:
     def location_id_valid(self, location_id):
         sql = '''SELECT id FROM mirror_locations WHERE id=%s;'''
 
-        db = mysql.connector.connect(user='root', host=self._host, database=self._db)
-        cur = db.cursor()
+        cur = self._db.cursor()
         cur.execute(sql, (location_id,))
 
         res = cur.fetchall()
 
         cur.close()
-        db.close()
 
         return len(res) > 0
     
     def get_products_info(self, ids):
         sql = '''SELECT mp.id, mp.name, mpl.language FROM mirror_products mp JOIN mirror_product_langs mpl ON mp.id=mpl.product_id WHERE mp.id=%s'''
 
-        db = mysql.connector.connect(user='root', host=self._host, database=self._db)
-        cur = db.cursor()
+        cur = self._db.cursor()
         products = []
         for id in ids:
             cur.execute(sql, (id,))
@@ -485,8 +450,7 @@ class MySQLModel:
     def get_locations_info(self, ids):
         sql = '''SELECT ml.id, ml.product_id, mp.name, path, mo.name FROM mirror_locations ml JOIN mirror_products mp ON ml.product_id=mp.id JOIN mirror_os mo ON mo.id=ml.os_id WHERE mp.id=%s'''
 
-        db = mysql.connector.connect(user='root', host=self._host, database=self._db)
-        cur = db.cursor()
+        cur = self._db.cursor()
         products = []
         for id in ids:
             cur.execute(sql, (id,))
@@ -506,11 +470,10 @@ class MySQLModel:
     
     ''' TEST HELPER FUNCTIONS '''
     def _reset_db(self):
-        db = mysql.connector.connect(user='root', host=self._host, database=self._db)
-        cur = db.cursor()
+        cur = self._db.cursor()
 
         for line in open('data.sql'):
             cur.execute(line)
         
-        db.commit()
-        db.close()
+        cur.close()
+        self._db.commit()
