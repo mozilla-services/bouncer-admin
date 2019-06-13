@@ -3,21 +3,21 @@ import tempfile
 
 import pytest
 
-import sys,os
+import sys, os
 from nazgul import create_app
+
 
 @pytest.fixture
 def client():
     app = create_app()
-    db_fd, app.config['DATABASE'] = tempfile.mkstemp()
-    app.config['TESTING'] = True
+    db_fd, app.config["DATABASE"] = tempfile.mkstemp()
+    app.config["TESTING"] = True
     client = app.test_client()
 
     # with nazgul.app.app_context():
-    #nazgul.init_db()
+    # nazgul.init_db()
 
     yield client
 
     os.close(db_fd)
-    os.unlink(app.config['DATABASE'])
-    
+    os.unlink(app.config["DATABASE"])
