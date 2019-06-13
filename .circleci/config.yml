@@ -6,6 +6,17 @@
 #
 version: 2
 jobs:
+  style:
+    docker:
+      - image: python:3
+    steps:
+      - checkout
+      - run:
+          name: Install yapf
+          command: pip install yapf==0.27.0
+      - run:
+          name: Yapf Python
+          command: yapf --recursive --diff .
   build:
     docker:
       - image: docker:stable-git
@@ -94,6 +105,9 @@ jobs:
 
 workflows:
   version: 2
+  lint:
+    jobs:
+      - style
   build-test-deploy:
     jobs:
       - build:
