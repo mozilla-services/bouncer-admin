@@ -3,8 +3,9 @@ import tempfile
 
 import pytest
 
-import sys,os
+import sys, os
 from nazgul import create_app
+
 
 @pytest.fixture
 def client():
@@ -20,4 +21,3 @@ def client():
 
     os.close(db_fd)
     os.unlink(app.config['DATABASE'])
-    

@@ -1,5 +1,6 @@
 from xml.dom import minidom
 
+
 class XMLRenderer(object):
     """Render API data as XML"""
 
@@ -105,8 +106,11 @@ class XMLRenderer(object):
 
     def error(self, message, errno=0, render=True):
         """Prepare an error message"""
-        return self.message(
-            message, type='error', number=errno, render=render, status=400)
+        return self.message(message,
+                            type='error',
+                            number=errno,
+                            render=render,
+                            status=400)
 
     def message(self,
                 message,
