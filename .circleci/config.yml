@@ -6,6 +6,17 @@
 #
 version: 2
 jobs:
+  style:
+    docker:
+      - image: python:3
+    steps:
+      - checkout
+      - run:
+          name: Install black
+          command: pip install black==19.3b0
+      - run:
+          name: Black Python
+          command: black --diff --check .
   build:
     docker:
       - image: docker:stable-git
@@ -94,6 +105,11 @@ jobs:
 
 workflows:
   version: 2
+
+  lint:
+    jobs:
+      - style
+
   build-test-deploy:
     jobs:
       - build:
