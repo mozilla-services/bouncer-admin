@@ -36,7 +36,7 @@ class MySQLModel:
 
         locs = self.get_locations_info(ids)
 
-        return locs, True
+        return locs
 
     def location_add(self, product, os, path):
         os_exists, os_id = self.os_exists(os)
@@ -44,11 +44,11 @@ class MySQLModel:
         location_exists, location_id = self.location_exists(os, product)
 
         if not os_exists:
-            return 106, False
+            raise ModelError("FAILED: '" + os + "' does not exist", 106)
         if not product_exists:
-            return 105, False
+            raise ModelError("FAILED: '" + product + "' does not exist", 105)
         if location_exists:
-            return 104, False
+            raise ModelError("The specified location already exists.", 104)
 
         sql = """INSERT INTO mirror_locations (product_id, os_id, path) VALUES (%s,%s,%s)"""
 
@@ -60,7 +60,7 @@ class MySQLModel:
         cur.close()
 
         products = self.get_locations_info([product_id])
-        return products, True
+        return products
 
     def location_modify(self, product, os, path):
         os_exists, os_id = self.os_exists(os)
@@ -68,11 +68,14 @@ class MySQLModel:
         location_exists, location_id = self.location_exists(os, product)
 
         if not os_exists:
-            return 106, False
+            raise ModelError("FAILED: '" + os + "' does not exist", 106)
         if not product_exists:
-            return 105, False
+            raise ModelError("FAILED: '" + product + "' does not exist", 105)
         if not location_exists:
-            return 104, False
+            raise ModelError(
+                "FAILED: location '" + product + "' on OS '" + os + "' does not exist",
+                104,
+            )
 
         sql = """UPDATE mirror_locations SET path=%s WHERE os_id=%s AND product_id=%s"""
 
@@ -84,11 +87,11 @@ class MySQLModel:
         cur.close()
 
         products = self.get_locations_info([product_id])
-        return products, True
+        return products
 
     def location_delete(self, location_id):
         if not self.location_id_valid(location_id):
-            return 102, False
+            raise ModelError("No location found.", 102)
 
         sql = """DELETE FROM mirror_locations WHERE id=%s"""
 
@@ -99,7 +102,7 @@ class MySQLModel:
 
         cur.close()
 
-        return "SUCCESS: location has been deleted", True
+        return "SUCCESS: location has been deleted"
 
     def product_show(self, product, fuzzy):
         if fuzzy:
@@ -120,12 +123,12 @@ class MySQLModel:
             ids.append(line[0])
 
         products = self.get_products_info(ids)
-        return products, True
+        return products
 
     def product_add(self, product, languages, ssl_only):
         product_exists, product_id = self.product_exists(product)
         if product_exists:
-            return 104, False
+            raise ModelError("product already exists.", 104)
 
         sql = """INSERT INTO mirror_products (name, ssl_only) VALUES (%s, %s)"""
 
@@ -143,12 +146,12 @@ class MySQLModel:
         cur.close()
 
         products = self.get_products_info([product_id])
-        return products, True
+        return products
 
     def product_delete_name(self, name):
         product_exists, product_id = self.product_exists(name)
         if not product_exists:
-            return 102, False
+            raise ModelError("No product found.", 102)
 
         cur = self._db.cursor()
 
@@ -165,7 +168,7 @@ class MySQLModel:
 
         cur.close()
 
-        return "SUCCESS: product has been deleted", True
+        return "SUCCESS: product has been deleted"
 
     def product_delete_id(self, id):
         cur = self._db.cursor()
@@ -183,12 +186,12 @@ class MySQLModel:
 
         cur.close()
 
-        return "SUCCESS: product has been deleted", True
+        return "SUCCESS: product has been deleted"
 
     def product_language_add(self, product, languages):
         product_exists, product_id = self.product_exists(product)
         if not product_exists:
-            return 102, False
+            raise ModelError("Product not found.", 102)
 
         cur = self._db.cursor()
 
@@ -201,12 +204,12 @@ class MySQLModel:
         cur.close()
 
         products = self.get_products_info([product_id])
-        return products, True
+        return products
 
     def product_language_delete(self, product, languages):
         product_exists, product_id = self.product_exists(product)
         if not product_exists:
-            return 102, False
+            raise ModelError("Product not found.", 102)
 
         cur = self._db.cursor()
 
@@ -222,7 +225,7 @@ class MySQLModel:
 
         cur.close()
 
-        return "SUCCESS: language has been deleted", True
+        return "SUCCESS: language has been deleted"
 
     def mirror_list(self):
         cur = self._db.cursor()
@@ -238,7 +241,7 @@ class MySQLModel:
 
         cur.close()
 
-        return mirrors, True
+        return mirrors
 
     def uptake(self, product, os, fuzzy):
         cur = self._db.cursor()
@@ -256,7 +259,7 @@ class MySQLModel:
             res = cur.fetchall()
             product_names = [line[0] for line in res]
             if not product_names:
-                return 102, False
+                raise ModelError("No products found", 102)
 
         os_names = None
         if os:
@@ -271,19 +274,23 @@ class MySQLModel:
             res = cur.fetchall()
             os_names = [line[0] for line in res]
             if not os_names:
-                return 103, False
+                raise ModelError("No OSes found", 103)
 
         cur.close()
 
-        return {"product_names": product_names, "os_names": os_names}, True
+        return {"product_names": product_names, "os_names": os_names}
 
     def create_update_alias(self, alias, related_product):
         product_exists, product_id = self.product_exists(related_product)
         if not product_exists:
-            return 103, False
+            raise ModelError(
+                "You must specify a valid product to match with an alias", 103
+            )
         alias_name_match, product_id = self.product_exists(alias)
         if alias_name_match:
-            return 104, False
+            raise ModelError(
+                "You cannot create an alias with the same name as a product", 104
+            )
 
         alias_exists, alias_id = self.alias_exists(alias)
 
@@ -299,7 +306,7 @@ class MySQLModel:
 
         cur.close()
 
-        return "Created/updated alias " + alias, True
+        return "Created/updated alias " + alias
 
     def os_exists(self, os):
         sql = """SELECT id FROM mirror_os WHERE name=%s;"""
@@ -425,3 +432,9 @@ class MySQLModel:
 
         cur.close()
         self._db.commit()
+
+
+class ModelError(Exception):
+    def __init__(self, message, errno):
+        self.message = message
+        self.errno = errno
