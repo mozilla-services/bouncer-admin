@@ -1,11 +1,7 @@
 from flask import Flask, render_template, request, Response, Blueprint
 
-try:
-    from nazgul.mysql_model import MySQLModel, ModelError
-    import nazgul.xmlrenderer as xmlrenderer
-except:
-    from mysql_model import MySQLModel, ModelError
-    import xmlrenderer
+from nazgul.mysql_model import MySQLModel, ModelError
+import nazgul.xmlrenderer as xmlrenderer
 import urllib.parse
 import ast
 import os
@@ -285,9 +281,3 @@ def create_update_alias():
         data = xml.error("Unknown error")
         status = 400
     return Response(data, mimetype="text/xml"), status
-
-
-if __name__ == "__main__":
-    app = Flask(__name__, instance_relative_config=True)
-    app.register_blueprint(bp)
-    app.run(host="0.0.0.0", port=5000)
