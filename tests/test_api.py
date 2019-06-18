@@ -49,7 +49,7 @@ def test_location_add_product_not_found(client):
         "api/location_add",
         data=dict(product="FakeProduct", path="/test_path", os="osx"),
     )
-    expected = b'<?xml version="1.0" encoding="utf-8"?><error number="104">FAILED: \'FakeProduct\' does not exist</error>'
+    expected = b'<?xml version="1.0" encoding="utf-8"?><error number="105">FAILED: \'FakeProduct\' does not exist</error>'
     assert expected == rv.data
 
 
@@ -57,7 +57,7 @@ def test_location_add_os_not_found(client):
     rv = client.post(
         "api/location_add", data=dict(product="Firefox", path="/test_path", os="fake")
     )
-    expected = b'<?xml version="1.0" encoding="utf-8"?><error number="104">FAILED: \'fake\' does not exist</error>'
+    expected = b'<?xml version="1.0" encoding="utf-8"?><error number="106">FAILED: \'fake\' does not exist</error>'
     assert expected == rv.data
 
 
@@ -114,7 +114,7 @@ def test_location_modify_invalid_product(client):
         "api/location_modify",
         data=dict(product="FakeProduct", os="osx", path="/newpath"),
     )
-    expected = b'<?xml version="1.0" encoding="utf-8"?><error number="104">FAILED: \'FakeProduct\' does not exist</error>'
+    expected = b'<?xml version="1.0" encoding="utf-8"?><error number="105">FAILED: \'FakeProduct\' does not exist</error>'
     assert expected == rv.data
 
 
@@ -123,7 +123,7 @@ def test_location_modify_invalid_os(client):
         "api/location_modify",
         data=dict(product="Firefox", os="fakeos", path="/newpath"),
     )
-    expected = b'<?xml version="1.0" encoding="utf-8"?><error number="104">FAILED: \'fakeos\' does not exist</error>'
+    expected = b'<?xml version="1.0" encoding="utf-8"?><error number="106">FAILED: \'fakeos\' does not exist</error>'
     assert expected == rv.data
 
 
