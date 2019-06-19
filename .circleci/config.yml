@@ -74,6 +74,12 @@ jobs:
           command: |
             sudo pip3 install --no-cache -r requirements.txt
             pytest -vv
+      - run:
+          name: Bouncerscript Test
+          command: |
+            sudo pip3 install https://github.com/AmanuelAaron/bouncerscript/archive/server-integration-test.zip
+            bouncerscript bouncerscript_config.json
+            
 
 
   deploy:
