@@ -28,7 +28,7 @@ class MySQLModel:
 
         locations = []
         for line in res:
-            locations.append({"id": line[0], "path": line[1], "os_name":line[2]})
+            locations.append({"id": line[0], "path": line[1], "os_name": line[2]})
 
         return locations
 
