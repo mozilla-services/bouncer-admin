@@ -78,6 +78,7 @@ jobs:
           name: Bouncerscript Test
           command: |
             sudo pip3 install https://github.com/AmanuelAaron/bouncerscript/archive/server-integration-test.zip
+            python3 main.py &
             bouncerscript bouncerscript_config.json
             
 
