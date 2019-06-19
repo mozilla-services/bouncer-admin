@@ -27,9 +27,11 @@ def location_show():
         return Response(data, mimetype="text/xml"), 400
 
     try:
-        res = msm.location_show(product, fuzzy)
-        for loc in res:
-            xml.prepare_locations(loc)
+        # product, locations = msm.location_show(product, fuzzy)
+        products = msm.product_show(product, fuzzy)
+        for product in products:
+            locations = msm.get_locations(product["id"])
+            xml.prepare_locations(product, locations)
         data = xml.render()
         status = 200
     except Exception:
@@ -55,7 +57,8 @@ def location_add():
     try:
         res = msm.location_add(product, os, path)
         for p in res:
-            xml.prepare_locations(p)
+            prod = {"id": p["id"], "name": p["name"]}
+            xml.prepare_locations(prod, p["locations"])
         data = xml.render()
         status = 200
     except ModelError as e:
@@ -78,7 +81,8 @@ def location_modify():
     try:
         res = msm.location_modify(product, os, path)
         for p in res:
-            xml.prepare_locations(p)
+            prod = {"id": p["id"], "name": p["name"]}
+            xml.prepare_locations(prod, p["locations"])
         data = xml.render()
         status = 200
     except ModelError as e:

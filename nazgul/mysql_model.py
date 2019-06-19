@@ -16,12 +16,8 @@ class MySQLModel:
     def index(self):
         return "Welcome to Nazgul"
 
-    def location_show(self, product, fuzzy):
-        if fuzzy:
-            sql = """SELECT distinct id FROM mirror_products mp WHERE name LIKE %s;"""
-            product = "%" + product + "%"
-        else:
-            sql = """SELECT distinct id FROM mirror_products WHERE name = %s;"""
+    def get_locations(self, product):
+        sql = """SELECT ml.id, ml.path, mo.name FROM mirror_locations ml JOIN mirror_os mo ON ml.os_id=mo.id WHERE product_id=%s;"""
 
         cur = self._db.cursor()
         cur.execute(sql, (product,))
@@ -30,13 +26,11 @@ class MySQLModel:
 
         cur.close()
 
-        ids = []
+        locations = []
         for line in res:
-            ids.append(line[0])
+            locations.append({"id": line[0], "path": line[1], "os_name":line[2]})
 
-        locs = self.get_locations_info(ids)
-
-        return locs
+        return locations
 
     def location_add(self, product, os, path):
         os_exists, os_id = self.os_exists(os)

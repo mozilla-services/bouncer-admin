@@ -37,24 +37,42 @@ class XMLRenderer(object):
             item.setAttribute("baseurl", str(mirror["baseurl"]))
             root.appendChild(item)
 
-    def prepare_locations(self, product):
+    # def prepare_locations(self, product):
+    #     """Prepare list of locations for a given product"""
+    #     root = self.doc.documentElement
+    #     if not root:
+    #         root = self.doc.createElement("locations")
+    #         self.doc.appendChild(root)
+    #     prodnode = self.doc.createElement("product")
+    #     prodnode.setAttribute("id", str(product["id"]))
+    #     prodnode.setAttribute("name", product["name"])
+    #     root.appendChild(prodnode)
+
+    #     for location in product["locations"]:
+    #         locnode = self.doc.createElement("location")
+    #         locnode.setAttribute("id", str(location["id"]))
+    #         locnode.setAttribute("os", str(location["os_name"]))
+    #         locnode.appendChild(self.doc.createTextNode(location["path"]))
+    #         prodnode.appendChild(locnode)
+
+    def prepare_locations(self, product, locations):
         """Prepare list of locations for a given product"""
         root = self.doc.documentElement
         if not root:
-            root = self.doc.createElement("locations")
+            root = self.doc.createElement('locations')
             self.doc.appendChild(root)
-        prodnode = self.doc.createElement("product")
-        prodnode.setAttribute("id", str(product["id"]))
-        prodnode.setAttribute("name", product["name"])
+        prodnode = self.doc.createElement('product')
+        prodnode.setAttribute('id', str(product["id"]))
+        prodnode.setAttribute('name', product["name"])
         root.appendChild(prodnode)
 
-        for location in product["locations"]:
-            locnode = self.doc.createElement("location")
-            locnode.setAttribute("id", str(location["id"]))
-            locnode.setAttribute("os", str(location["os_name"]))
+        for location in locations:
+            locnode = self.doc.createElement('location')
+            locnode.setAttribute('id', str(location["id"]))
+            locnode.setAttribute('os', str(location["os_name"]))
             locnode.appendChild(self.doc.createTextNode(location["path"]))
             prodnode.appendChild(locnode)
-
+    
     def prepare_uptake_fake(self, products, oses):
         root = self.doc.createElement("mirror_uptake")
         self.doc.appendChild(root)
