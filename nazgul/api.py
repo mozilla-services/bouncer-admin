@@ -3,7 +3,6 @@ from flask import Flask, render_template, request, Response, Blueprint
 from nazgul.mysql_model import MySQLModel, ModelError
 import nazgul.xmlrenderer as xmlrenderer
 import urllib.parse
-import ast
 import os
 
 bp = Blueprint("api", __name__, url_prefix="/api")
@@ -17,7 +16,7 @@ def index():
     return "Nazgul API"
 
 
-@bp.route("/location_show", methods=["GET"])
+@bp.route("/location_show/", methods=["GET"])
 def location_show():
     xml = xmlrenderer.XMLRenderer()
 
@@ -28,9 +27,11 @@ def location_show():
         return Response(data, mimetype="text/xml"), 400
 
     try:
-        res = msm.location_show(product, fuzzy)
-        for loc in res:
-            xml.prepare_locations(loc)
+        # product, locations = msm.location_show(product, fuzzy)
+        products = msm.product_show(product, fuzzy)
+        for product in products:
+            locations = msm.get_locations(product["id"])
+            xml.prepare_locations(product, locations)
         data = xml.render()
         status = 200
     except Exception:
@@ -40,7 +41,7 @@ def location_show():
     return Response(data, mimetype="text/xml"), status
 
 
-@bp.route("/location_add", methods=["POST"])
+@bp.route("/location_add/", methods=["POST"])
 def location_add():
     xml = xmlrenderer.XMLRenderer()
 
@@ -56,7 +57,8 @@ def location_add():
     try:
         res = msm.location_add(product, os, path)
         for p in res:
-            xml.prepare_locations(p)
+            prod = {"id": p["id"], "name": p["name"]}
+            xml.prepare_locations(prod, p["locations"])
         data = xml.render()
         status = 200
     except ModelError as e:
@@ -69,7 +71,7 @@ def location_add():
     return Response(data, mimetype="text/xml"), status
 
 
-@bp.route("/location_modify", methods=["POST"])
+@bp.route("/location_modify/", methods=["POST"])
 def location_modify():
     xml = xmlrenderer.XMLRenderer()
 
@@ -79,7 +81,8 @@ def location_modify():
     try:
         res = msm.location_modify(product, os, path)
         for p in res:
-            xml.prepare_locations(p)
+            prod = {"id": p["id"], "name": p["name"]}
+            xml.prepare_locations(prod, p["locations"])
         data = xml.render()
         status = 200
     except ModelError as e:
@@ -92,7 +95,7 @@ def location_modify():
     return Response(data, mimetype="text/xml"), status
 
 
-@bp.route("/location_delete", methods=["POST"])
+@bp.route("/location_delete/", methods=["POST"])
 def location_delete():
     xml = xmlrenderer.XMLRenderer()
 
@@ -114,7 +117,7 @@ def location_delete():
     return Response(data, mimetype="text/xml"), status
 
 
-@bp.route("/product_show", methods=["GET"])
+@bp.route("/product_show/", methods=["GET"])
 def product_show():
     xml = xmlrenderer.XMLRenderer()
 
@@ -132,13 +135,12 @@ def product_show():
     return Response(data, mimetype="text/xml"), status
 
 
-@bp.route("/product_add", methods=["POST"])
+@bp.route("/product_add/", methods=["POST"])
 def product_add():
     xml = xmlrenderer.XMLRenderer()
 
     product = request.form.get("product", None)
-    lang_in = request.form.get("languages", None)
-    languages = ast.literal_eval(urllib.parse.unquote(lang_in))
+    languages = request.form.getlist("languages", None)
     ssl_only = request.form.get("ssl_only") == "True"
     try:
         res = msm.product_add(product, languages, ssl_only)
@@ -155,7 +157,7 @@ def product_add():
     return Response(data, mimetype="text/xml"), status
 
 
-@bp.route("/product_delete", methods=["POST"])
+@bp.route("/product_delete/", methods=["POST"])
 def product_delete():
     xml = xmlrenderer.XMLRenderer()
 
@@ -179,13 +181,12 @@ def product_delete():
     return Response(data, mimetype="text/xml"), status
 
 
-@bp.route("/product_language_add", methods=["POST"])
+@bp.route("/product_language_add/", methods=["POST"])
 def product_language_add():
     xml = xmlrenderer.XMLRenderer()
 
     product = request.form.get("product", None)
-    lang_in = request.form.get("languages", None)
-    languages = ast.literal_eval(urllib.parse.unquote(lang_in))
+    languages = request.form.getlist("languages", None)
     try:
         res = msm.product_language_add(product, languages)
         xml.prepare_products(res)
@@ -200,13 +201,12 @@ def product_language_add():
     return Response(data, mimetype="text/xml"), status
 
 
-@bp.route("/product_language_delete", methods=["POST"])
+@bp.route("/product_language_delete/", methods=["POST"])
 def product_language_delete():
     xml = xmlrenderer.XMLRenderer()
 
     product = request.form.get("product", None)
-    lang_in = request.form.get("languages", None)
-    languages = ast.literal_eval(urllib.parse.unquote(lang_in))
+    languages = request.form.getlist("languages", None)
     try:
         res = msm.product_language_delete(product, languages)
         data = xml.success(res)
@@ -220,7 +220,7 @@ def product_language_delete():
     return Response(data, mimetype="text/xml"), status
 
 
-@bp.route("/mirror_list", methods=["GET"])
+@bp.route("/mirror_list/", methods=["GET"])
 def mirror_list():
     xml = xmlrenderer.XMLRenderer()
 
@@ -230,7 +230,7 @@ def mirror_list():
     return Response(data, mimetype="text/xml"), 400
 
 
-@bp.route("/uptake", methods=["GET"])
+@bp.route("/uptake/", methods=["GET"])
 def uptake():
     xml = xmlrenderer.XMLRenderer()
 
@@ -256,7 +256,7 @@ def uptake():
     return Response(data, mimetype="text/xml"), status
 
 
-@bp.route("/create_update_alias", methods=["POST"])
+@bp.route("/create_update_alias/", methods=["POST"])
 def create_update_alias():
     xml = xmlrenderer.XMLRenderer()
 

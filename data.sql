@@ -124,7 +124,7 @@ DROP TABLE IF EXISTS `mirror_os`;
 SET character_set_client = utf8mb4 ;
 CREATE TABLE `mirror_os` (`id` int(10) unsigned NOT NULL AUTO_INCREMENT,`name` varchar(32) NOT NULL DEFAULT '',`priority` int(11) NOT NULL DEFAULT '0',PRIMARY KEY (`id`,`name`)) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8;
 LOCK TABLES `mirror_os` WRITE;
-INSERT INTO `mirror_os` VALUES (1,'win64',0),(2,'osx',0),(3,'win',0);
+INSERT INTO `mirror_os` VALUES (1,'win64',0),(2,'osx',0),(3,'win',0),(4,'linux',0),(5,'linux64', 0);
 UNLOCK TABLES;
 DROP TABLE IF EXISTS `mirror_product_langs`;
 SET character_set_client = utf8mb4 ;
