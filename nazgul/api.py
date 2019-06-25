@@ -11,6 +11,16 @@ test_db = os.environ.get("DATABASE_URL", "127.0.0.1")
 msm = MySQLModel(host=test_db)
 
 
+@bp.route("/__heartbeat__", methods=["GET", "POST"])
+def heartbeat():
+    return "OK"
+
+
+@bp.route("/__lbheartbeat__", methods=["GET", "POST"])
+def lbheartbeat():
+    return "OK"
+
+
 @bp.route("/", methods=["GET", "POST"])
 def index():
     return "Nazgul API"
