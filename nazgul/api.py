@@ -8,7 +8,9 @@ import os
 bp = Blueprint("api", __name__, url_prefix="/api")
 
 test_db = os.environ.get("DATABASE_URL", "127.0.0.1")
-msm = MySQLModel(host=test_db)
+username = os.environ.get("DB_USER", "root")
+password = os.environ.get("DB_PASS", "")
+msm = MySQLModel(host=test_db, user=username, password=password)
 
 
 @bp.route("/__heartbeat__", methods=["GET", "POST"])
