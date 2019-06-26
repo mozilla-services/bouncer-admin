@@ -10,7 +10,7 @@ class MySQLModel:
         self._db_name = db
         # TODO: Should I have autocommit always True?
         self._db = mysql.connector.connect(
-            user=user, host=host, database=db, autocommit=True
+            user=user, host=host, database=db, autocommit=True, password=password
         )
 
     def index(self):
