@@ -11,7 +11,7 @@ hb = Blueprint("heartbeat", __name__)
 test_db = os.environ.get("DATABASE_URL", "127.0.0.1")
 username = os.environ.get("DB_USER", "root")
 password = os.environ.get("DB_PASS", "")
-pool_size = os.environ.get("DB_CONNECTION_POOL_SIZE", 3)
+pool_size = int(os.environ.get("DB_CONNECTION_POOL_SIZE", 3))
 msm = MySQLModel(host=test_db, user=username, password=password, pool_size=pool_size)
 
 
