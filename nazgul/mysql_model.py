@@ -3,15 +3,20 @@ import mysql.connector
 
 
 class MySQLModel:
-    def __init__(self, user="root", host="127.0.0.1", password="", db="bouncer"):
-        self._pass = password
-        self._user = user
-        self._host = host
-        self._db_name = db
+    def __init__(
+        self, user="root", host="127.0.0.1", password="", db="bouncer", pool_size=3
+    ):
+        self.db_config = {
+            "database": db,
+            "user": user,
+            "password": password,
+            "host": host,
+            "autocommit": True,
+            "pool_name": "bouncer_pool",
+            "pool_size": pool_size,
+        }
         # TODO: Should I have autocommit always True?
-        self._db = mysql.connector.connect(
-            user=user, host=host, database=db, autocommit=True, password=password
-        )
+        self._db = mysql.connector.connect(**self.db_config)
 
     def index(self):
         return "Welcome to Nazgul"

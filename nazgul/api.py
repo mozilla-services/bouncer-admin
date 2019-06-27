@@ -11,7 +11,8 @@ hb = Blueprint("heartbeat", __name__)
 test_db = os.environ.get("DATABASE_URL", "127.0.0.1")
 username = os.environ.get("DB_USER", "root")
 password = os.environ.get("DB_PASS", "")
-msm = MySQLModel(host=test_db, user=username, password=password)
+pool_size = os.environ.get("DB_CONNECTION_POOL_SIZE", 3)
+msm = MySQLModel(host=test_db, user=username, password=password, pool_size=pool_size)
 
 
 @hb.route("/__heartbeat__", methods=["GET", "POST"])
@@ -240,7 +241,7 @@ def mirror_list():
     res = msm.mirror_list()
     xml.prepare_mirrors(res)
     data = xml.render()
-    return Response(data, mimetype="text/xml"), 400
+    return Response(data, mimetype="text/xml"), 200
 
 
 @bp.route("/uptake/", methods=["GET"])
