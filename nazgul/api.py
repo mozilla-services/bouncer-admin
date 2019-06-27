@@ -49,7 +49,7 @@ def location_show():
         status = 200
     except Exception:
         data = xml.error("Unknown error")
-        status = 400
+        status = 500
 
     return Response(data, mimetype="text/xml"), status
 
@@ -79,7 +79,7 @@ def location_add():
         status = 400
     except Exception:
         data = xml.error("Unknown error")
-        status = 400
+        status = 500
 
     return Response(data, mimetype="text/xml"), status
 
@@ -103,7 +103,7 @@ def location_modify():
         status = 400
     except Exception:
         data = xml.error("Unknown error")
-        status = 400
+        status = 500
 
     return Response(data, mimetype="text/xml"), status
 
@@ -126,7 +126,7 @@ def location_delete():
         status = 400
     except Exception:
         data = xml.error("Unknown error")
-        status = 400
+        status = 500
     return Response(data, mimetype="text/xml"), status
 
 
@@ -143,7 +143,7 @@ def product_show():
         status = 200
     except Exception:
         data = xml.error("Unknown error")
-        status = 400
+        status = 500
 
     return Response(data, mimetype="text/xml"), status
 
@@ -165,7 +165,7 @@ def product_add():
         status = 400
     except Exception:
         data = xml.error("Unknown error")
-        status = 400
+        status = 500
 
     return Response(data, mimetype="text/xml"), status
 
@@ -189,7 +189,7 @@ def product_delete():
         status = 400
     except Exception:
         data = xml.error("Unknown error")
-        status = 400
+        status = 500
 
     return Response(data, mimetype="text/xml"), status
 
@@ -210,7 +210,7 @@ def product_language_add():
         status = 400
     except Exception:
         data = xml.error("Unknown error")
-        status = 400
+        status = 500
     return Response(data, mimetype="text/xml"), status
 
 
@@ -229,7 +229,7 @@ def product_language_delete():
         status = 400
     except Exception:
         data = xml.error("Unknown error")
-        status = 400
+        status = 500
     return Response(data, mimetype="text/xml"), status
 
 
@@ -265,7 +265,7 @@ def uptake():
         status = 400
     except Exception:
         data = xml.error("Unknown error")
-        status = 400
+        status = 500
     return Response(data, mimetype="text/xml"), status
 
 
@@ -292,5 +292,5 @@ def create_update_alias():
         status = 400
     except Exception:
         data = xml.error("Unknown error")
-        status = 400
+        status = 500
     return Response(data, mimetype="text/xml"), status
