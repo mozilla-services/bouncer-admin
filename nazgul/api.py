@@ -6,9 +6,22 @@ import urllib.parse
 import os
 
 bp = Blueprint("api", __name__, url_prefix="/api")
+hb = Blueprint("heartbeat", __name__)
 
 test_db = os.environ.get("DATABASE_URL", "127.0.0.1")
-msm = MySQLModel(host=test_db)
+username = os.environ.get("DB_USER", "root")
+password = os.environ.get("DB_PASS", "")
+msm = MySQLModel(host=test_db, user=username, password=password)
+
+
+@hb.route("/__heartbeat__", methods=["GET", "POST"])
+def heartbeat():
+    return "OK"
+
+
+@hb.route("/__lbheartbeat__", methods=["GET", "POST"])
+def lbheartbeat():
+    return "OK"
 
 
 @bp.route("/", methods=["GET", "POST"])
