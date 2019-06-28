@@ -15,6 +15,10 @@ pool_size = int(os.environ.get("DB_CONNECTION_POOL_SIZE", 3))
 msm = MySQLModel(host=test_db, user=username, password=password, pool_size=pool_size)
 
 
+@hb.route("/", methods=["GET", "POST"])
+def home():
+    return "Nazgul"
+
 @hb.route("/__heartbeat__", methods=["GET", "POST"])
 def heartbeat():
     return "OK"
