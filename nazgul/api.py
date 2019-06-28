@@ -19,6 +19,7 @@ msm = MySQLModel(host=test_db, user=username, password=password, pool_size=pool_
 def home():
     return "Nazgul"
 
+
 @hb.route("/__heartbeat__", methods=["GET", "POST"])
 def heartbeat():
     return "OK"
