@@ -1,5 +1,5 @@
 # Import data to mysql
-mysql -u root < data.sql
+mysql $@ < data.sql
 status=$?
 if [ $status -ne 0 ]; then
     echo "Failed to import data.sql into MySQL database. Check that you have mysql and user 'root' is given access without a password\n"

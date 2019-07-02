@@ -10,7 +10,8 @@ The admin interface for https://github.com/mozilla-services/go-bouncer/.
 ---
 ## How to get started
 
-```sh app.sh```
+```sh app.sh MYSQL_LOGIN```
+> replace ```MYSQL_LOGIN``` with whatever parameter you use to connect to mysql with read and write privileges (eg. ```sh app.sh -u root -p```)
 
 Run ```docker exec -it local-nazgul pytest``` in a separate terminal to test the code
 
