@@ -22,6 +22,8 @@ class MySQLModel:
         return "Welcome to Nazgul"
 
     def get_locations(self, product):
+        self._db_heartbeat()
+
         sql = """SELECT ml.id, ml.path, mo.name FROM mirror_locations ml JOIN mirror_os mo ON ml.os_id=mo.id WHERE product_id=%s;"""
 
         cur = self._db.cursor()
@@ -38,6 +40,8 @@ class MySQLModel:
         return locations
 
     def location_add(self, product, os, path):
+        self._db_heartbeat()
+
         os_exists, os_id = self.os_exists(os)
         product_exists, product_id = self.product_exists(product)
         location_exists, location_id = self.location_exists(os, product)
@@ -62,6 +66,8 @@ class MySQLModel:
         return products
 
     def location_modify(self, product, os, path):
+        self._db_heartbeat()
+
         os_exists, os_id = self.os_exists(os)
         product_exists, product_id = self.product_exists(product)
         location_exists, location_id = self.location_exists(os, product)
@@ -89,6 +95,8 @@ class MySQLModel:
         return products
 
     def location_delete(self, location_id):
+        self._db_heartbeat()
+
         if not self.location_id_valid(location_id):
             raise ModelError("No location found.", 102)
 
@@ -104,6 +112,8 @@ class MySQLModel:
         return "SUCCESS: location has been deleted"
 
     def product_show(self, product, fuzzy):
+        self._db_heartbeat()
+
         if fuzzy:
             sql = """SELECT id FROM mirror_products WHERE name LIKE %s;"""
             product = "%" + product + "%"
@@ -125,6 +135,8 @@ class MySQLModel:
         return products
 
     def product_add(self, product, languages, ssl_only):
+        self._db_heartbeat()
+
         product_exists, product_id = self.product_exists(product)
         if product_exists:
             raise ModelError("product already exists.", 104)
@@ -148,6 +160,8 @@ class MySQLModel:
         return products
 
     def product_delete_name(self, name):
+        self._db_heartbeat()
+
         product_exists, product_id = self.product_exists(name)
         if not product_exists:
             raise ModelError("No product found.", 102)
@@ -170,6 +184,8 @@ class MySQLModel:
         return "SUCCESS: product has been deleted"
 
     def product_delete_id(self, id):
+        self._db_heartbeat()
+
         cur = self._db.cursor()
 
         sql = """DELETE FROM mirror_products WHERE id=%s"""
@@ -188,6 +204,8 @@ class MySQLModel:
         return "SUCCESS: product has been deleted"
 
     def product_language_add(self, product, languages):
+        self._db_heartbeat()
+
         product_exists, product_id = self.product_exists(product)
         if not product_exists:
             raise ModelError("Product not found.", 102)
@@ -206,6 +224,8 @@ class MySQLModel:
         return products
 
     def product_language_delete(self, product, languages):
+        self._db_heartbeat()
+
         product_exists, product_id = self.product_exists(product)
         if not product_exists:
             raise ModelError("Product not found.", 102)
@@ -227,6 +247,8 @@ class MySQLModel:
         return "SUCCESS: language has been deleted"
 
     def mirror_list(self):
+        self._db_heartbeat()
+
         cur = self._db.cursor()
 
         sql = """SELECT baseurl FROM mirror_mirrors WHERE active=1"""
@@ -243,6 +265,8 @@ class MySQLModel:
         return mirrors
 
     def uptake(self, product, os, fuzzy):
+        self._db_heartbeat()
+
         cur = self._db.cursor()
 
         product_names = None
@@ -280,6 +304,8 @@ class MySQLModel:
         return {"product_names": product_names, "os_names": os_names}
 
     def create_update_alias(self, alias, related_product):
+        self._db_heartbeat()
+
         product_exists, product_id = self.product_exists(related_product)
         if not product_exists:
             raise ModelError(
@@ -431,6 +457,16 @@ class MySQLModel:
 
         cur.close()
         self._db.commit()
+    
+    def _db_heartbeat(self):
+        try:
+            sql = """SELECT 'heartbeat' """
+            cur = self._db.cursor()
+            cur.execute(sql)
+            cur.fetchall()
+            cur.close()
+        except mysql.connector.errors.OperationalError:
+            self._db = mysql.connector.connect(**self.db_config)
 
 
 class ModelError(Exception):
