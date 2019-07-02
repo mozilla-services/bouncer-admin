@@ -431,7 +431,7 @@ class MySQLModel:
 
         cur.close()
         self._db.commit()
-    
+
     def _get_cursor(self):
         try:
             cur = self._db.cursor()
