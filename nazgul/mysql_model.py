@@ -457,7 +457,7 @@ class MySQLModel:
 
         cur.close()
         self._db.commit()
-    
+
     def _db_heartbeat(self):
         try:
             sql = """SELECT 'heartbeat' """
