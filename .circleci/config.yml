@@ -83,7 +83,7 @@ jobs:
             python3 main.py &
             bouncerscript bouncerscript_config.json
       - run:
-          name: PyCov
+          name: PyTest Cover
           command: |
             pytest --cov-fail-under=97 --cov=tests/ . > tests/coverage.txt
       - codecov/upload:
