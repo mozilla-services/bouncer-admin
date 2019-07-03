@@ -5,6 +5,8 @@
 # DOCKER_PASS
 #
 version: 2
+orbs:
+  codecov: codecov/codecov@1.0.2
 jobs:
   style:
     docker:
@@ -80,6 +82,12 @@ jobs:
             sudo pip3 install https://github.com/AmanuelAaron/bouncerscript/archive/server-integration-test.zip
             python3 main.py &
             bouncerscript bouncerscript_config.json
+      - run:
+          name: PyCov
+          command: |
+            pytest --cov-fail-under=97 --cov=tests/ . > tests/coverage.txt
+      - codecov/upload:
+          file: {{ tests/coverage.txt }}
             
 
 
