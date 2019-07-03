@@ -87,7 +87,7 @@ jobs:
           command: |
             pytest --cov-fail-under=97 --cov=tests/ . > tests/coverage.txt
       - codecov/upload:
-          file: {{ tests/coverage.txt }}
+          file: tests/coverage.txt
             
 
 
