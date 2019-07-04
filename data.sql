@@ -1,4 +1,6 @@
 SET NAMES utf8mb4 ;
+CREATE DATABASE IF NOT EXISTS bouncer;
+USE bouncer;
 DROP TABLE IF EXISTS `auth_group`;
 SET character_set_client = utf8mb4 ;
 CREATE TABLE `auth_group` (`id` int(11) NOT NULL AUTO_INCREMENT,`name` varchar(80) NOT NULL,PRIMARY KEY (`id`),UNIQUE KEY `name` (`name`)) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
