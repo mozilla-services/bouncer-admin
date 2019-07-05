@@ -24,7 +24,7 @@ class MySQLModel:
     def get_locations(self, product):
         sql = """SELECT ml.id, ml.path, mo.name FROM mirror_locations ml JOIN mirror_os mo ON ml.os_id=mo.id WHERE product_id=%s;"""
 
-        cur = self._db.cursor()
+        cur = self._get_cursor()
         cur.execute(sql, (product,))
 
         res = cur.fetchall()
@@ -51,7 +51,7 @@ class MySQLModel:
 
         sql = """INSERT INTO mirror_locations (product_id, os_id, path) VALUES (%s,%s,%s)"""
 
-        cur = self._db.cursor()
+        cur = self._get_cursor()
         cur.execute(sql, (product_id, os_id, path))
 
         self._db.commit()
@@ -78,7 +78,7 @@ class MySQLModel:
 
         sql = """UPDATE mirror_locations SET path=%s WHERE os_id=%s AND product_id=%s"""
 
-        cur = self._db.cursor()
+        cur = self._get_cursor()
         cur.execute(sql, (path, os_id, product_id))
 
         self._db.commit()
@@ -94,7 +94,7 @@ class MySQLModel:
 
         sql = """DELETE FROM mirror_locations WHERE id=%s"""
 
-        cur = self._db.cursor()
+        cur = self._get_cursor()
         cur.execute(sql, (location_id,))
 
         self._db.commit()
@@ -110,7 +110,7 @@ class MySQLModel:
         else:
             sql = """SELECT id FROM mirror_products WHERE name = %s;"""
 
-        cur = self._db.cursor()
+        cur = self._get_cursor()
         cur.execute(sql, (product,))
 
         res = cur.fetchall()
@@ -131,7 +131,7 @@ class MySQLModel:
 
         sql = """INSERT INTO mirror_products (name, ssl_only) VALUES (%s, %s)"""
 
-        cur = self._db.cursor()
+        cur = self._get_cursor()
         cur.execute(sql, (product, int(ssl_only)))
         self._db.commit()
 
@@ -152,7 +152,7 @@ class MySQLModel:
         if not product_exists:
             raise ModelError("No product found.", 102)
 
-        cur = self._db.cursor()
+        cur = self._get_cursor()
 
         sql = """DELETE FROM mirror_products WHERE id=%s"""
         cur.execute(sql, (product_id,))
@@ -170,7 +170,7 @@ class MySQLModel:
         return "SUCCESS: product has been deleted"
 
     def product_delete_id(self, id):
-        cur = self._db.cursor()
+        cur = self._get_cursor()
 
         sql = """DELETE FROM mirror_products WHERE id=%s"""
         cur.execute(sql, (id,))
@@ -192,7 +192,7 @@ class MySQLModel:
         if not product_exists:
             raise ModelError("Product not found.", 102)
 
-        cur = self._db.cursor()
+        cur = self._get_cursor()
 
         for lang in languages:
             sql = """INSERT INTO mirror_product_langs (product_id, language) VALUES (%s, %s)"""
@@ -210,7 +210,7 @@ class MySQLModel:
         if not product_exists:
             raise ModelError("Product not found.", 102)
 
-        cur = self._db.cursor()
+        cur = self._get_cursor()
 
         if languages[0] == "*":
             sql = """DELETE FROM mirror_product_langs WHERE product_id=%s"""
@@ -227,7 +227,7 @@ class MySQLModel:
         return "SUCCESS: language has been deleted"
 
     def mirror_list(self):
-        cur = self._db.cursor()
+        cur = self._get_cursor()
 
         sql = """SELECT baseurl FROM mirror_mirrors WHERE active=1"""
         cur.execute(sql)
@@ -243,7 +243,7 @@ class MySQLModel:
         return mirrors
 
     def uptake(self, product, os, fuzzy):
-        cur = self._db.cursor()
+        cur = self._get_cursor()
 
         product_names = None
         if product:
@@ -293,7 +293,7 @@ class MySQLModel:
 
         alias_exists, alias_id = self.alias_exists(alias)
 
-        cur = self._db.cursor()
+        cur = self._get_cursor()
         if alias_exists:
             sql = """UPDATE mirror_aliases SET related_product=%s WHERE alias=%s"""
             cur.execute(sql, (related_product, alias))
@@ -310,7 +310,7 @@ class MySQLModel:
     def os_exists(self, os):
         sql = """SELECT id FROM mirror_os WHERE name=%s;"""
 
-        cur = self._db.cursor()
+        cur = self._get_cursor()
         cur.execute(sql, (os,))
 
         res = cur.fetchall()
@@ -325,7 +325,7 @@ class MySQLModel:
     def product_exists(self, product):
         sql = """SELECT id FROM mirror_products WHERE name=%s;"""
 
-        cur = self._db.cursor()
+        cur = self._get_cursor()
         cur.execute(sql, (product,))
 
         res = cur.fetchall()
@@ -340,7 +340,7 @@ class MySQLModel:
     def location_exists(self, os, product):
         sql = """SELECT ml.id FROM mirror_locations ml JOIN mirror_os mo ON ml.os_id=mo.id JOIN mirror_products mp ON ml.product_id=mp.id WHERE mo.name=%s AND mp.name=%s;"""
 
-        cur = self._db.cursor()
+        cur = self._get_cursor()
         cur.execute(sql, (os, product))
 
         res = cur.fetchall()
@@ -355,7 +355,7 @@ class MySQLModel:
     def alias_exists(self, alias):
         sql = """SELECT id FROM mirror_aliases WHERE alias=%s;"""
 
-        cur = self._db.cursor()
+        cur = self._get_cursor()
         cur.execute(sql, (alias,))
 
         res = cur.fetchall()
@@ -370,7 +370,7 @@ class MySQLModel:
     def location_id_valid(self, location_id):
         sql = """SELECT id FROM mirror_locations WHERE id=%s;"""
 
-        cur = self._db.cursor()
+        cur = self._get_cursor()
         cur.execute(sql, (location_id,))
 
         res = cur.fetchall()
@@ -382,7 +382,7 @@ class MySQLModel:
     def get_products_info(self, ids):
         sql = """SELECT mp.id, mp.name, mpl.language FROM mirror_products mp JOIN mirror_product_langs mpl ON mp.id=mpl.product_id WHERE mp.id=%s"""
 
-        cur = self._db.cursor()
+        cur = self._get_cursor()
         products = []
         for id in ids:
             cur.execute(sql, (id,))
@@ -403,7 +403,7 @@ class MySQLModel:
     def get_locations_info(self, ids):
         sql = """SELECT ml.id, ml.product_id, mp.name, path, mo.name FROM mirror_locations ml JOIN mirror_products mp ON ml.product_id=mp.id JOIN mirror_os mo ON mo.id=ml.os_id WHERE mp.id=%s"""
 
-        cur = self._db.cursor()
+        cur = self._get_cursor()
         products = []
         for id in ids:
             cur.execute(sql, (id,))
@@ -431,6 +431,14 @@ class MySQLModel:
 
         cur.close()
         self._db.commit()
+
+    def _get_cursor(self):
+        try:
+            cur = self._db.cursor()
+        except mysql.connector.errors.OperationalError:
+            self._db = mysql.connector.connect(**self.db_config)
+            cur = self._db.cursor()
+        return cur
 
 
 class ModelError(Exception):
