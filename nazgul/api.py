@@ -1,4 +1,6 @@
 from flask import Flask, render_template, request, Response, Blueprint
+from flask_httpauth import HTTPBasicAuth
+from werkzeug.security import generate_password_hash, check_password_hash
 
 from nazgul.mysql_model import MySQLModel, ModelError
 import nazgul.xmlrenderer as xmlrenderer
@@ -8,34 +10,51 @@ import os
 bp = Blueprint("api", __name__, url_prefix="/api")
 hb = Blueprint("heartbeat", __name__)
 
+auth = HTTPBasicAuth()
+
+users = {
+    "john": generate_password_hash("test"),
+    "susan": generate_password_hash("bye")
+}
+
 test_db = os.environ.get("DATABASE_URL", "127.0.0.1")
 username = os.environ.get("DB_USER", "root")
 password = os.environ.get("DB_PASS", "")
 pool_size = int(os.environ.get("DB_CONNECTION_POOL_SIZE", 3))
 msm = MySQLModel(host=test_db, user=username, password=password, pool_size=pool_size)
 
+@auth.verify_password
+def verify_password(username, password):
+    if username in users:
+        return check_password_hash(users.get(username), password)
+    return False
 
 @hb.route("/", methods=["GET", "POST"])
+@auth.login_required
 def home():
     return "Nazgul"
 
 
 @hb.route("/__heartbeat__", methods=["GET", "POST"])
+@auth.login_required
 def heartbeat():
     return "OK"
 
 
 @hb.route("/__lbheartbeat__", methods=["GET", "POST"])
+@auth.login_required
 def lbheartbeat():
     return "OK"
 
 
 @bp.route("/", methods=["GET", "POST"])
+@auth.login_required
 def index():
     return "Nazgul API"
 
 
 @bp.route("/location_show/", methods=["GET"])
+@auth.login_required
 def location_show():
     xml = xmlrenderer.XMLRenderer()
 
@@ -61,6 +80,7 @@ def location_show():
 
 
 @bp.route("/location_add/", methods=["POST"])
+@auth.login_required
 def location_add():
     xml = xmlrenderer.XMLRenderer()
 
@@ -91,6 +111,7 @@ def location_add():
 
 
 @bp.route("/location_modify/", methods=["POST"])
+@auth.login_required
 def location_modify():
     xml = xmlrenderer.XMLRenderer()
 
@@ -115,6 +136,7 @@ def location_modify():
 
 
 @bp.route("/location_delete/", methods=["POST"])
+@auth.login_required
 def location_delete():
     xml = xmlrenderer.XMLRenderer()
 
@@ -137,6 +159,7 @@ def location_delete():
 
 
 @bp.route("/product_show/", methods=["GET"])
+@auth.login_required
 def product_show():
     xml = xmlrenderer.XMLRenderer()
 
@@ -155,6 +178,7 @@ def product_show():
 
 
 @bp.route("/product_add/", methods=["POST"])
+@auth.login_required
 def product_add():
     xml = xmlrenderer.XMLRenderer()
 
@@ -177,6 +201,7 @@ def product_add():
 
 
 @bp.route("/product_delete/", methods=["POST"])
+@auth.login_required
 def product_delete():
     xml = xmlrenderer.XMLRenderer()
 
@@ -201,6 +226,7 @@ def product_delete():
 
 
 @bp.route("/product_language_add/", methods=["POST"])
+@auth.login_required
 def product_language_add():
     xml = xmlrenderer.XMLRenderer()
 
@@ -221,6 +247,7 @@ def product_language_add():
 
 
 @bp.route("/product_language_delete/", methods=["POST"])
+@auth.login_required
 def product_language_delete():
     xml = xmlrenderer.XMLRenderer()
 
@@ -240,6 +267,7 @@ def product_language_delete():
 
 
 @bp.route("/mirror_list/", methods=["GET"])
+@auth.login_required
 def mirror_list():
     xml = xmlrenderer.XMLRenderer()
 
@@ -250,6 +278,7 @@ def mirror_list():
 
 
 @bp.route("/uptake/", methods=["GET"])
+@auth.login_required
 def uptake():
     xml = xmlrenderer.XMLRenderer()
 
@@ -276,6 +305,7 @@ def uptake():
 
 
 @bp.route("/create_update_alias/", methods=["POST"])
+@auth.login_required
 def create_update_alias():
     xml = xmlrenderer.XMLRenderer()
 
