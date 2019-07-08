@@ -5,7 +5,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from nazgul.mysql_model import MySQLModel, ModelError
 import nazgul.xmlrenderer as xmlrenderer
 import urllib.parse
-import os
+import os, time, logging
 
 bp = Blueprint("api", __name__, url_prefix="/api")
 hb = Blueprint("heartbeat", __name__)
@@ -20,10 +20,20 @@ password = os.environ.get("DB_PASS", "")
 pool_size = int(os.environ.get("DB_CONNECTION_POOL_SIZE", 3))
 msm = MySQLModel(host=test_db, user=username, password=password, pool_size=pool_size)
 
+# Setup logging
+logger = logging.getLogger("nazgul")
+logger.setLevel(logging.DEBUG)
+
+fh = logging.FileHandler("nazgul.log")
+fh.setLevel(logging.DEBUG)
+
+logger.addHandler(fh)
 
 @auth.verify_password
 def verify_password(username, password):
     if username in users:
+        #TODO: is current format for logs is TIME - IP ADDR - USER - ENDPOINT, is there more info tgat we need to log?
+        logger.info("{0} - {1} - {2} - {3}".format(time.strftime('%m/%d/%Y %H:%M:%S'), request.remote_addr, username, request.full_path))
         return check_password_hash(users.get(username), password)
     return False
 
@@ -33,15 +43,13 @@ def verify_password(username, password):
 def home():
     return "Nazgul"
 
-
+#TODO: I didn't put auth for the heartbeat functions, is this fine?
 @hb.route("/__heartbeat__", methods=["GET", "POST"])
-@auth.login_required
 def heartbeat():
     return "OK"
 
 
 @hb.route("/__lbheartbeat__", methods=["GET", "POST"])
-@auth.login_required
 def lbheartbeat():
     return "OK"
 
