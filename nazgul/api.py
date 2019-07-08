@@ -13,8 +13,7 @@ hb = Blueprint("heartbeat", __name__)
 auth = HTTPBasicAuth()
 
 users = {
-    "john": generate_password_hash("test"),
-    "susan": generate_password_hash("bye")
+    "admin": generate_password_hash(os.environ.get("AUTH_PASS")),
 }
 
 test_db = os.environ.get("DATABASE_URL", "127.0.0.1")
