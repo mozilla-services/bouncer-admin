@@ -27,7 +27,11 @@ logger.setLevel(logging.DEBUG)
 fh = logging.FileHandler("nazgul.log")
 fh.setLevel(logging.DEBUG)
 
+eh = logging.FileHandler("error.log")
+eh.setLevel(logging.ERROR)
+
 logger.addHandler(fh)
+logger.addHandler(eh)
 
 
 @auth.verify_password
@@ -88,9 +92,17 @@ def location_show():
             xml.prepare_locations(product, locations)
         data = xml.render()
         status = 200
-    except Exception:
+    except Exception as e:
         data = xml.error("Unknown error")
         status = 500
+        logger.error(
+            "{0} - {1} - {2} - {3}".format(
+                time.strftime("%m/%d/%Y %H:%M:%S"),
+                request.remote_addr,
+                username,
+                "Uncaught Exception: {0}".format(e),
+            )
+        )
 
     return Response(data, mimetype="text/xml"), status
 
@@ -122,6 +134,14 @@ def location_add():
     except Exception:
         data = xml.error("Unknown error")
         status = 500
+        logger.error(
+            "{0} - {1} - {2} - {3}".format(
+                time.strftime("%m/%d/%Y %H:%M:%S"),
+                request.remote_addr,
+                username,
+                "Uncaught Exception: {0}".format(e),
+            )
+        )
 
     return Response(data, mimetype="text/xml"), status
 
@@ -147,6 +167,14 @@ def location_modify():
     except Exception:
         data = xml.error("Unknown error")
         status = 500
+        logger.error(
+            "{0} - {1} - {2} - {3}".format(
+                time.strftime("%m/%d/%Y %H:%M:%S"),
+                request.remote_addr,
+                username,
+                "Uncaught Exception: {0}".format(e),
+            )
+        )
 
     return Response(data, mimetype="text/xml"), status
 
@@ -171,6 +199,14 @@ def location_delete():
     except Exception:
         data = xml.error("Unknown error")
         status = 500
+        logger.error(
+            "{0} - {1} - {2} - {3}".format(
+                time.strftime("%m/%d/%Y %H:%M:%S"),
+                request.remote_addr,
+                username,
+                "Uncaught Exception: {0}".format(e),
+            )
+        )
     return Response(data, mimetype="text/xml"), status
 
 
@@ -189,6 +225,14 @@ def product_show():
     except Exception:
         data = xml.error("Unknown error")
         status = 500
+        logger.error(
+            "{0} - {1} - {2} - {3}".format(
+                time.strftime("%m/%d/%Y %H:%M:%S"),
+                request.remote_addr,
+                username,
+                "Uncaught Exception: {0}".format(e),
+            )
+        )
 
     return Response(data, mimetype="text/xml"), status
 
@@ -212,6 +256,14 @@ def product_add():
     except Exception:
         data = xml.error("Unknown error")
         status = 500
+        logger.error(
+            "{0} - {1} - {2} - {3}".format(
+                time.strftime("%m/%d/%Y %H:%M:%S"),
+                request.remote_addr,
+                username,
+                "Uncaught Exception: {0}".format(e),
+            )
+        )
 
     return Response(data, mimetype="text/xml"), status
 
@@ -237,6 +289,14 @@ def product_delete():
     except Exception:
         data = xml.error("Unknown error")
         status = 500
+        logger.error(
+            "{0} - {1} - {2} - {3}".format(
+                time.strftime("%m/%d/%Y %H:%M:%S"),
+                request.remote_addr,
+                username,
+                "Uncaught Exception: {0}".format(e),
+            )
+        )
 
     return Response(data, mimetype="text/xml"), status
 
@@ -259,6 +319,14 @@ def product_language_add():
     except Exception:
         data = xml.error("Unknown error")
         status = 500
+        logger.error(
+            "{0} - {1} - {2} - {3}".format(
+                time.strftime("%m/%d/%Y %H:%M:%S"),
+                request.remote_addr,
+                username,
+                "Uncaught Exception: {0}".format(e),
+            )
+        )
     return Response(data, mimetype="text/xml"), status
 
 
@@ -279,6 +347,14 @@ def product_language_delete():
     except Exception:
         data = xml.error("Unknown error")
         status = 500
+        logger.error(
+            "{0} - {1} - {2} - {3}".format(
+                time.strftime("%m/%d/%Y %H:%M:%S"),
+                request.remote_addr,
+                username,
+                "Uncaught Exception: {0}".format(e),
+            )
+        )
     return Response(data, mimetype="text/xml"), status
 
 
@@ -317,6 +393,14 @@ def uptake():
     except Exception:
         data = xml.error("Unknown error")
         status = 500
+        logger.error(
+            "{0} - {1} - {2} - {3}".format(
+                time.strftime("%m/%d/%Y %H:%M:%S"),
+                request.remote_addr,
+                username,
+                "Uncaught Exception: {0}".format(e),
+            )
+        )
     return Response(data, mimetype="text/xml"), status
 
 
@@ -345,4 +429,12 @@ def create_update_alias():
     except Exception:
         data = xml.error("Unknown error")
         status = 500
+        logger.error(
+            "{0} - {1} - {2} - {3}".format(
+                time.strftime("%m/%d/%Y %H:%M:%S"),
+                request.remote_addr,
+                username,
+                "Uncaught Exception: {0}".format(e),
+            )
+        )
     return Response(data, mimetype="text/xml"), status
