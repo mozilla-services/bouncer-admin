@@ -10,6 +10,7 @@ EXPOSE 5000
 ENV FLASK_APP nazgul.py
 ENV FLASK_ENV production
 ENV DATABASE_URL=host.docker.internal
+ENV AUTH_PASS=admin
 
 COPY . /app
 CMD ["python3", "main.py"]
