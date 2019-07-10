@@ -33,7 +33,6 @@ logger.addHandler(fh)
 @auth.verify_password
 def verify_password(username, password):
     if username in users:
-        # TODO: is current format for logs is TIME - IP ADDR - USER - ENDPOINT, is there more info tgat we need to log?
         logger.info(
             "{0} - {1} - {2} - {3}".format(
                 time.strftime("%m/%d/%Y %H:%M:%S"),
@@ -52,7 +51,6 @@ def home():
     return "Nazgul"
 
 
-# TODO: I didn't put auth for the heartbeat functions, is this fine?
 @hb.route("/__heartbeat__", methods=["GET"])
 def heartbeat():
     return "OK"
