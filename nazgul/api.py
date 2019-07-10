@@ -53,12 +53,12 @@ def home():
 
 
 # TODO: I didn't put auth for the heartbeat functions, is this fine?
-@hb.route("/__heartbeat__", methods=["GET", "POST"])
+@hb.route("/__heartbeat__", methods=["GET"])
 def heartbeat():
     return "OK"
 
 
-@hb.route("/__lbheartbeat__", methods=["GET", "POST"])
+@hb.route("/__lbheartbeat__", methods=["GET"]])
 def lbheartbeat():
     return "OK"
 
