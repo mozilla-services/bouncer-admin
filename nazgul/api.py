@@ -58,7 +58,7 @@ def heartbeat():
     return "OK"
 
 
-@hb.route("/__lbheartbeat__", methods=["GET"]])
+@hb.route("/__lbheartbeat__", methods=["GET"])
 def lbheartbeat():
     return "OK"
 
