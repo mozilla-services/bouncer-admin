@@ -1,0 +1,14 @@
+{
+    "work_dir": "./work_dir",
+    "artifact_dir": "./artifact_dir",
+    "verbose": true,
+    "taskcluster_scope_prefix": "project:releng:bouncer:",
+    "bouncer_config": {
+        "project:releng:bouncer:server:staging": {
+            "api_root": "http://0.0.0.0:5000/api",
+            "timeout_in_seconds": 60,
+            "username": "admin",
+            "password": "admin"
+        }
+    }
+}
