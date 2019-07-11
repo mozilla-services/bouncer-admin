@@ -88,9 +88,9 @@ jobs:
             sudo mkdir /usr/local/lib/python3.7/site-packages/bouncerscript/work_dir
             sudo mkdir /usr/local/lib/python3.7/site-packages/bouncerscript/artifact_dir
             sudo cp bouncerscript_prod_task.json /usr/local/lib/python3.7/site-packages/bouncerscript/work_dir/task.json
-            cd /usr/local/lib/python3.7/site-packages/bouncerscript/
+            # cd /usr/local/lib/python3.7/site-packages/bouncerscript/
             # sudo pip3 install .
-            cd
+            # cd
             python3 main.py &
             bouncerscript bouncerscript_prod_config.json
       - run:
