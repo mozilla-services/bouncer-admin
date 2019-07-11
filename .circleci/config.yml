@@ -86,10 +86,10 @@ jobs:
           name: Bouncerscript Test w/ Production Payload
           command: |
             sudo pip3 install https://github.com/AmanuelAaron/bouncerscript/archive/server-integration-test.zip
-            mkdir /usr/local/lib/python3.7/site-packages/bouncerscript/work_dir
-            mkdir /usr/local/lib/python3.7/site-packages/bouncerscript/artifact_dir
-            cp bouncerscript_prod_task /usr/local/lib/python3.7/site-packages/bouncerscript/work_dir/task.json
-            cd /usr/local/lib/python3.7/site-packages/bouncerscript/
+            sudo mkdir /usr/local/lib/python3.7/site-packages/bouncerscript/work_dir
+            sudo mkdir /usr/local/lib/python3.7/site-packages/bouncerscript/artifact_dir
+            sudo cp bouncerscript_prod_task /usr/local/lib/python3.7/site-packages/bouncerscript/work_dir/task.json
+            sudo cd /usr/local/lib/python3.7/site-packages/bouncerscript/
             sudo pip3 install -e .
             python3 main.py &
             bouncerscript bouncerscript_prod_config.json
