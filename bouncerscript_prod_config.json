@@ -1,6 +1,6 @@
 {
-    "work_dir": "./work_dir",
-    "artifact_dir": "./artifact_dir",
+    "work_dir": "/usr/local/lib/python3.7/site-packages/bouncerscript/work_dir",
+    "artifact_dir": "/usr/local/lib/python3.7/site-packages/bouncerscript/artifact_dir",
     "verbose": true,
     "taskcluster_scope_prefix": "project:releng:bouncer:",
     "bouncer_config": {
