@@ -96,7 +96,7 @@ jobs:
       - run:
           name: PyTest Cover
           command: |
-            pytest --cov-fail-under=88 --cov=./ --cov-report=xml
+            pytest --cov-fail-under=85 --cov=./ --cov-report=xml
       - codecov/upload:
           file: ./coverage.xml
             
