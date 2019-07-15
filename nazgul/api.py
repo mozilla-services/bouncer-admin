@@ -30,6 +30,19 @@ fh.setLevel(logging.DEBUG)
 logger.addHandler(fh)
 
 
+def print_json_log(time, message, path):
+    log_json = (
+        '{"Timestamp":'
+        + time
+        + ',"Fields":{"method": "GET","msg":"'
+        + message
+        + '","path":"'
+        + path
+        + '"}}'
+    )
+    print(json.dumps(json.loads(log_json), indent=4))
+
+
 @auth.verify_password
 def verify_password(username, password):
     if username in users:
@@ -90,17 +103,11 @@ def location_show():
         data = xml.error("Unknown error")
         status = 500
 
-        log_json = (
-            '{"Timestamp":'
-            + "%.0f" % (time.time() * 1000000000)
-            + ',"Fields":{"method": "GET","msg":"'
-            + "Uncaught Exception: {0}".format(e)
-            + '","path":"'
-            + request.full_path
-            + '"}}'
+        print_json_log(
+            "%.0f" % (time.time() * 1000000000),
+            "Uncaught Exception: {0}".format(e),
+            request.full_path,
         )
-        print(json.dumps(json.loads(log_json), indent=4))
-
     return Response(data, mimetype="text/xml"), status
 
 
@@ -132,16 +139,11 @@ def location_add():
         data = xml.error("Unknown error")
         status = 500
 
-        log_json = (
-            '{"Timestamp":'
-            + "%.0f" % (time.time() * 1000000000)
-            + ',"Fields":{"method": "POST","msg":"'
-            + "Uncaught Exception: {0}".format(e)
-            + '","path":"'
-            + request.full_path
-            + '"}}'
+        print_json_log(
+            "%.0f" % (time.time() * 1000000000),
+            "Uncaught Exception: {0}".format(e),
+            request.full_path,
         )
-        print(json.dumps(json.loads(log_json), indent=4))
 
     return Response(data, mimetype="text/xml"), status
 
@@ -168,16 +170,11 @@ def location_modify():
         data = xml.error("Unknown error")
         status = 500
 
-        log_json = (
-            '{"Timestamp":'
-            + "%.0f" % (time.time() * 1000000000)
-            + ',"Fields":{"method": "POST","msg":"'
-            + "Uncaught Exception: {0}".format(e)
-            + '","path":"'
-            + request.full_path
-            + '"}}'
+        print_json_log(
+            "%.0f" % (time.time() * 1000000000),
+            "Uncaught Exception: {0}".format(e),
+            request.full_path,
         )
-        print(json.dumps(json.loads(log_json), indent=4))
 
     return Response(data, mimetype="text/xml"), status
 
@@ -203,16 +200,11 @@ def location_delete():
         data = xml.error("Unknown error")
         status = 500
 
-        log_json = (
-            '{"Timestamp":'
-            + "%.0f" % (time.time() * 1000000000)
-            + ',"Fields":{"method": "POST","msg":"'
-            + "Uncaught Exception: {0}".format(e)
-            + '","path":"'
-            + request.full_path
-            + '"}}'
+        print_json_log(
+            "%.0f" % (time.time() * 1000000000),
+            "Uncaught Exception: {0}".format(e),
+            request.full_path,
         )
-        print(json.dumps(json.loads(log_json), indent=4))
     return Response(data, mimetype="text/xml"), status
 
 
@@ -232,16 +224,11 @@ def product_show():
         data = xml.error("Unknown error")
         status = 500
 
-        log_json = (
-            '{"Timestamp":'
-            + "%.0f" % (time.time() * 1000000000)
-            + ',"Fields":{"method": "GET","msg":"'
-            + "Uncaught Exception: {0}".format(e)
-            + '","path":"'
-            + request.full_path
-            + '"}}'
+        print_json_log(
+            "%.0f" % (time.time() * 1000000000),
+            "Uncaught Exception: {0}".format(e),
+            request.full_path,
         )
-        print(json.dumps(json.loads(log_json), indent=4))
 
     return Response(data, mimetype="text/xml"), status
 
@@ -266,16 +253,11 @@ def product_add():
         data = xml.error("Unknown error")
         status = 500
 
-        log_json = (
-            '{"Timestamp":'
-            + "%.0f" % (time.time() * 1000000000)
-            + ',"Fields":{"method": "POST","msg":"'
-            + "Uncaught Exception: {0}".format(e)
-            + '","path":"'
-            + request.full_path
-            + '"}}'
+        print_json_log(
+            "%.0f" % (time.time() * 1000000000),
+            "Uncaught Exception: {0}".format(e),
+            request.full_path,
         )
-        print(json.dumps(json.loads(log_json), indent=4))
 
     return Response(data, mimetype="text/xml"), status
 
@@ -302,16 +284,11 @@ def product_delete():
         data = xml.error("Unknown error")
         status = 500
 
-        log_json = (
-            '{"Timestamp":'
-            + "%.0f" % (time.time() * 1000000000)
-            + ',"Fields":{"method": "POST","msg":"'
-            + "Uncaught Exception: {0}".format(e)
-            + '","path":"'
-            + request.full_path
-            + '"}}'
+        print_json_log(
+            "%.0f" % (time.time() * 1000000000),
+            "Uncaught Exception: {0}".format(e),
+            request.full_path,
         )
-        print(json.dumps(json.loads(log_json), indent=4))
 
     return Response(data, mimetype="text/xml"), status
 
@@ -335,16 +312,11 @@ def product_language_add():
         data = xml.error("Unknown error")
         status = 500
 
-        log_json = (
-            '{"Timestamp":'
-            + "%.0f" % (time.time() * 1000000000)
-            + ',"Fields":{"method": "POST","msg":"'
-            + "Uncaught Exception: {0}".format(e)
-            + '","path":"'
-            + request.full_path
-            + '"}}'
+        print_json_log(
+            "%.0f" % (time.time() * 1000000000),
+            "Uncaught Exception: {0}".format(e),
+            request.full_path,
         )
-        print(json.dumps(json.loads(log_json), indent=4))
     return Response(data, mimetype="text/xml"), status
 
 
@@ -366,16 +338,11 @@ def product_language_delete():
         data = xml.error("Unknown error")
         status = 500
 
-        log_json = (
-            '{"Timestamp":'
-            + "%.0f" % (time.time() * 1000000000)
-            + ',"Fields":{"method": "POST","msg":"'
-            + "Uncaught Exception: {0}".format(e)
-            + '","path":"'
-            + request.full_path
-            + '"}}'
+        print_json_log(
+            "%.0f" % (time.time() * 1000000000),
+            "Uncaught Exception: {0}".format(e),
+            request.full_path,
         )
-        print(json.dumps(json.loads(log_json), indent=4))
     return Response(data, mimetype="text/xml"), status
 
 
@@ -415,14 +382,10 @@ def uptake():
         data = xml.error("Unknown error")
         status = 500
 
-        log_json = (
-            '{"Timestamp":'
-            + "%.0f" % (time.time() * 1000000000)
-            + ',"Fields":{"method": "GET","msg":"'
-            + "Uncaught Exception: {0}".format(e)
-            + '","path":"'
-            + request.full_path
-            + '"}}'
+        print_json_log(
+            "%.0f" % (time.time() * 1000000000),
+            "Uncaught Exception: {0}".format(e),
+            request.full_path,
         )
     return Response(data, mimetype="text/xml"), status
 
@@ -453,14 +416,9 @@ def create_update_alias():
         data = xml.error("Unknown error")
         status = 500
 
-        log_json = (
-            '{"Timestamp":'
-            + "%.0f" % (time.time() * 1000000000)
-            + ',"Fields":{"method": "POST","msg":"'
-            + "Uncaught Exception: {0}".format(e)
-            + '","path":"'
-            + request.full_path
-            + '"}}'
+        print_json_log(
+            "%.0f" % (time.time() * 1000000000),
+            "Uncaught Exception: {0}".format(e),
+            request.full_path,
         )
-        print(json.dumps(json.loads(log_json), indent=4))
     return Response(data, mimetype="text/xml"), status

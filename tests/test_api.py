@@ -361,3 +361,14 @@ def test_create_update_alias(client):
     expected = b'<?xml version="1.0" encoding="utf-8"?><success>Created/updated alias aaron-product</success>'
     msm._reset_db()
     assert expected == rv.data
+
+
+def test_unknown_error(client):
+    rv = client.post(
+        "api/product_delete/",
+        data={"product_id": "1a"},
+        headers={"Authorization": requests.auth._basic_auth_str(test_user, test_pass)},
+    )
+    expected = b'<?xml version="1.0" encoding="utf-8"?><error>Unknown error</error>'
+    msm._reset_db()
+    assert expected == rv.data
