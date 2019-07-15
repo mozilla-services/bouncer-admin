@@ -241,7 +241,6 @@ def product_show():
             + request.full_path
             + '"}}'
         )
-        print(log_json)
         print(json.dumps(json.loads(log_json), indent=4))
 
     return Response(data, mimetype="text/xml"), status
