@@ -83,6 +83,17 @@ jobs:
             python3 main.py &
             bouncerscript bouncerscript_config.json
       - run:
+          name: Bouncerscript Test w/ Production Payload
+          command: |
+            sudo mkdir /usr/local/lib/python3.7/site-packages/bouncerscript/work_dir
+            sudo mkdir /usr/local/lib/python3.7/site-packages/bouncerscript/artifact_dir
+            sudo cp bouncerscript_prod_task.json /usr/local/lib/python3.7/site-packages/bouncerscript/work_dir/task.json
+            # cd /usr/local/lib/python3.7/site-packages/bouncerscript/
+            # sudo pip3 install .
+            # cd
+            python3 main.py &
+            bouncerscript bouncerscript_prod_config.json
+      - run:
           name: PyTest Cover
           command: |
             pytest --cov-fail-under=88 --cov=./ --cov-report=xml
