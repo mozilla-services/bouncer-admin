@@ -104,7 +104,6 @@ class MySQLModel:
         return "SUCCESS: location has been deleted"
 
     def product_show(self, product, fuzzy):
-        x=1/0
         if fuzzy:
             sql = """SELECT id FROM mirror_products WHERE name LIKE %s;"""
             product = "%" + product + "%"
