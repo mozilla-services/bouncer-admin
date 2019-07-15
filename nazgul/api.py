@@ -5,7 +5,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from nazgul.mysql_model import MySQLModel, ModelError
 import nazgul.xmlrenderer as xmlrenderer
 import urllib.parse
-import os, time, logging
+import os, time, logging, json
 
 bp = Blueprint("api", __name__, url_prefix="/api")
 hb = Blueprint("heartbeat", __name__)
@@ -27,11 +27,7 @@ logger.setLevel(logging.DEBUG)
 fh = logging.FileHandler("nazgul.log")
 fh.setLevel(logging.DEBUG)
 
-eh = logging.FileHandler("error.log")
-eh.setLevel(logging.ERROR)
-
 logger.addHandler(fh)
-logger.addHandler(eh)
 
 
 @auth.verify_password
@@ -93,14 +89,17 @@ def location_show():
     except Exception as e:
         data = xml.error("Unknown error")
         status = 500
-        logger.error(
-            "{0} - {1} - {2} - {3}".format(
-                time.strftime("%m/%d/%Y %H:%M:%S"),
-                request.remote_addr,
-                username,
-                "Uncaught Exception: {0}".format(e),
-            )
+
+        log_json = (
+            '{"Timestamp":'
+            + "%.0f" % (time.time() * 1000000000)
+            + ',"Fields":{"method": "GET","msg":"'
+            + "Uncaught Exception: {0}".format(e)
+            + '","path":"'
+            + request.full_path
+            + '"}}'
         )
+        print(json.dumps(json.loads(log_json), indent=4))
 
     return Response(data, mimetype="text/xml"), status
 
@@ -129,17 +128,20 @@ def location_add():
     except ModelError as e:
         data = xml.error(e.message, errno=e.errno)
         status = 400
-    except Exception:
+    except Exception as e:
         data = xml.error("Unknown error")
         status = 500
-        logger.error(
-            "{0} - {1} - {2} - {3}".format(
-                time.strftime("%m/%d/%Y %H:%M:%S"),
-                request.remote_addr,
-                username,
-                "Uncaught Exception: {0}".format(e),
-            )
+
+        log_json = (
+            '{"Timestamp":'
+            + "%.0f" % (time.time() * 1000000000)
+            + ',"Fields":{"method": "POST","msg":"'
+            + "Uncaught Exception: {0}".format(e)
+            + '","path":"'
+            + request.full_path
+            + '"}}'
         )
+        print(json.dumps(json.loads(log_json), indent=4))
 
     return Response(data, mimetype="text/xml"), status
 
@@ -162,17 +164,20 @@ def location_modify():
     except ModelError as e:
         data = xml.error(e.message, errno=e.errno)
         status = 400
-    except Exception:
+    except Exception as e:
         data = xml.error("Unknown error")
         status = 500
-        logger.error(
-            "{0} - {1} - {2} - {3}".format(
-                time.strftime("%m/%d/%Y %H:%M:%S"),
-                request.remote_addr,
-                username,
-                "Uncaught Exception: {0}".format(e),
-            )
+
+        log_json = (
+            '{"Timestamp":'
+            + "%.0f" % (time.time() * 1000000000)
+            + ',"Fields":{"method": "POST","msg":"'
+            + "Uncaught Exception: {0}".format(e)
+            + '","path":"'
+            + request.full_path
+            + '"}}'
         )
+        print(json.dumps(json.loads(log_json), indent=4))
 
     return Response(data, mimetype="text/xml"), status
 
@@ -194,17 +199,20 @@ def location_delete():
     except ModelError as e:
         data = xml.error(e.message, errno=e.errno)
         status = 400
-    except Exception:
+    except Exception as e:
         data = xml.error("Unknown error")
         status = 500
-        logger.error(
-            "{0} - {1} - {2} - {3}".format(
-                time.strftime("%m/%d/%Y %H:%M:%S"),
-                request.remote_addr,
-                username,
-                "Uncaught Exception: {0}".format(e),
-            )
+
+        log_json = (
+            '{"Timestamp":'
+            + "%.0f" % (time.time() * 1000000000)
+            + ',"Fields":{"method": "POST","msg":"'
+            + "Uncaught Exception: {0}".format(e)
+            + '","path":"'
+            + request.full_path
+            + '"}}'
         )
+        print(json.dumps(json.loads(log_json), indent=4))
     return Response(data, mimetype="text/xml"), status
 
 
@@ -220,17 +228,21 @@ def product_show():
         xml.prepare_products(res)
         data = xml.render()
         status = 200
-    except Exception:
+    except Exception as e:
         data = xml.error("Unknown error")
         status = 500
-        logger.error(
-            "{0} - {1} - {2} - {3}".format(
-                time.strftime("%m/%d/%Y %H:%M:%S"),
-                request.remote_addr,
-                username,
-                "Uncaught Exception: {0}".format(e),
-            )
+
+        log_json = (
+            '{"Timestamp":'
+            + "%.0f" % (time.time() * 1000000000)
+            + ',"Fields":{"method": "GET","msg":"'
+            + "Uncaught Exception: {0}".format(e)
+            + '","path":"'
+            + request.full_path
+            + '"}}'
         )
+        print(log_json)
+        print(json.dumps(json.loads(log_json), indent=4))
 
     return Response(data, mimetype="text/xml"), status
 
@@ -251,17 +263,20 @@ def product_add():
     except ModelError as e:
         data = xml.error(e.message, errno=e.errno)
         status = 400
-    except Exception:
+    except Exception as e:
         data = xml.error("Unknown error")
         status = 500
-        logger.error(
-            "{0} - {1} - {2} - {3}".format(
-                time.strftime("%m/%d/%Y %H:%M:%S"),
-                request.remote_addr,
-                username,
-                "Uncaught Exception: {0}".format(e),
-            )
+
+        log_json = (
+            '{"Timestamp":'
+            + "%.0f" % (time.time() * 1000000000)
+            + ',"Fields":{"method": "POST","msg":"'
+            + "Uncaught Exception: {0}".format(e)
+            + '","path":"'
+            + request.full_path
+            + '"}}'
         )
+        print(json.dumps(json.loads(log_json), indent=4))
 
     return Response(data, mimetype="text/xml"), status
 
@@ -284,17 +299,20 @@ def product_delete():
     except ModelError as e:
         data = xml.error(e.message, errno=e.errno)
         status = 400
-    except Exception:
+    except Exception as e:
         data = xml.error("Unknown error")
         status = 500
-        logger.error(
-            "{0} - {1} - {2} - {3}".format(
-                time.strftime("%m/%d/%Y %H:%M:%S"),
-                request.remote_addr,
-                username,
-                "Uncaught Exception: {0}".format(e),
-            )
+
+        log_json = (
+            '{"Timestamp":'
+            + "%.0f" % (time.time() * 1000000000)
+            + ',"Fields":{"method": "POST","msg":"'
+            + "Uncaught Exception: {0}".format(e)
+            + '","path":"'
+            + request.full_path
+            + '"}}'
         )
+        print(json.dumps(json.loads(log_json), indent=4))
 
     return Response(data, mimetype="text/xml"), status
 
@@ -314,17 +332,20 @@ def product_language_add():
     except ModelError as e:
         data = xml.error(e.message, errno=e.errno)
         status = 400
-    except Exception:
+    except Exception as e:
         data = xml.error("Unknown error")
         status = 500
-        logger.error(
-            "{0} - {1} - {2} - {3}".format(
-                time.strftime("%m/%d/%Y %H:%M:%S"),
-                request.remote_addr,
-                username,
-                "Uncaught Exception: {0}".format(e),
-            )
+
+        log_json = (
+            '{"Timestamp":'
+            + "%.0f" % (time.time() * 1000000000)
+            + ',"Fields":{"method": "POST","msg":"'
+            + "Uncaught Exception: {0}".format(e)
+            + '","path":"'
+            + request.full_path
+            + '"}}'
         )
+        print(json.dumps(json.loads(log_json), indent=4))
     return Response(data, mimetype="text/xml"), status
 
 
@@ -342,17 +363,20 @@ def product_language_delete():
     except ModelError as e:
         data = xml.error(e.message, errno=e.errno)
         status = 400
-    except Exception:
+    except Exception as e:
         data = xml.error("Unknown error")
         status = 500
-        logger.error(
-            "{0} - {1} - {2} - {3}".format(
-                time.strftime("%m/%d/%Y %H:%M:%S"),
-                request.remote_addr,
-                username,
-                "Uncaught Exception: {0}".format(e),
-            )
+
+        log_json = (
+            '{"Timestamp":'
+            + "%.0f" % (time.time() * 1000000000)
+            + ',"Fields":{"method": "POST","msg":"'
+            + "Uncaught Exception: {0}".format(e)
+            + '","path":"'
+            + request.full_path
+            + '"}}'
         )
+        print(json.dumps(json.loads(log_json), indent=4))
     return Response(data, mimetype="text/xml"), status
 
 
@@ -388,16 +412,18 @@ def uptake():
         # Error no. for /uptake is always 102 in Tuxedo (Should this be changed in Nazgul?)
         data = xml.error(e.message, errno=102)
         status = 400
-    except Exception:
+    except Exception as e:
         data = xml.error("Unknown error")
         status = 500
-        logger.error(
-            "{0} - {1} - {2} - {3}".format(
-                time.strftime("%m/%d/%Y %H:%M:%S"),
-                request.remote_addr,
-                username,
-                "Uncaught Exception: {0}".format(e),
-            )
+
+        log_json = (
+            '{"Timestamp":'
+            + "%.0f" % (time.time() * 1000000000)
+            + ',"Fields":{"method": "GET","msg":"'
+            + "Uncaught Exception: {0}".format(e)
+            + '","path":"'
+            + request.full_path
+            + '"}}'
         )
     return Response(data, mimetype="text/xml"), status
 
@@ -424,15 +450,18 @@ def create_update_alias():
     except ModelError as e:
         data = xml.error(e.message, errno=e.errno)
         status = 400
-    except Exception:
+    except Exception as e:
         data = xml.error("Unknown error")
         status = 500
-        logger.error(
-            "{0} - {1} - {2} - {3}".format(
-                time.strftime("%m/%d/%Y %H:%M:%S"),
-                request.remote_addr,
-                username,
-                "Uncaught Exception: {0}".format(e),
-            )
+
+        log_json = (
+            '{"Timestamp":'
+            + "%.0f" % (time.time() * 1000000000)
+            + ',"Fields":{"method": "POST","msg":"'
+            + "Uncaught Exception: {0}".format(e)
+            + '","path":"'
+            + request.full_path
+            + '"}}'
         )
+        print(json.dumps(json.loads(log_json), indent=4))
     return Response(data, mimetype="text/xml"), status
