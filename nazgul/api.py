@@ -30,17 +30,19 @@ fh.setLevel(logging.DEBUG)
 logger.addHandler(fh)
 
 
-def print_json_log(time, message, path):
-    log_json = (
-        '{"Timestamp":'
-        + time
-        + ',"Fields":{"method": "GET","msg":"'
-        + message
-        + '","path":"'
-        + path
-        + '"}}'
-    )
-    print(json.dumps(json.loads(log_json), indent=4))
+class StructuredMessage(object):
+    def __init__(self, message, **kwargs):
+        self.message = message
+        self.kwargs = kwargs
+
+    def __str__(self):
+        return "%s >>> %s" % (self.message, json.dumps(self.kwargs))
+
+
+def print_json_log(message, time, method, path):
+    fields = {"method": method, "msg": message, "path": path}
+
+    print(StructuredMessage(message, Timestamp=time, Fields=fields))
 
 
 @auth.verify_password
@@ -104,8 +106,9 @@ def location_show():
         status = 500
 
         print_json_log(
-            "%.0f" % (time.time() * 1000000000),
             "Uncaught Exception: {0}".format(e),
+            "%.0f" % (time.time() * 1000000000),
+            request.method,
             request.full_path,
         )
     return Response(data, mimetype="text/xml"), status
@@ -140,8 +143,9 @@ def location_add():
         status = 500
 
         print_json_log(
-            "%.0f" % (time.time() * 1000000000),
             "Uncaught Exception: {0}".format(e),
+            "%.0f" % (time.time() * 1000000000),
+            request.method,
             request.full_path,
         )
 
@@ -171,8 +175,9 @@ def location_modify():
         status = 500
 
         print_json_log(
-            "%.0f" % (time.time() * 1000000000),
             "Uncaught Exception: {0}".format(e),
+            "%.0f" % (time.time() * 1000000000),
+            request.method,
             request.full_path,
         )
 
@@ -201,8 +206,9 @@ def location_delete():
         status = 500
 
         print_json_log(
-            "%.0f" % (time.time() * 1000000000),
             "Uncaught Exception: {0}".format(e),
+            "%.0f" % (time.time() * 1000000000),
+            request.method,
             request.full_path,
         )
     return Response(data, mimetype="text/xml"), status
@@ -225,8 +231,9 @@ def product_show():
         status = 500
 
         print_json_log(
-            "%.0f" % (time.time() * 1000000000),
             "Uncaught Exception: {0}".format(e),
+            "%.0f" % (time.time() * 1000000000),
+            request.method,
             request.full_path,
         )
 
@@ -254,8 +261,9 @@ def product_add():
         status = 500
 
         print_json_log(
-            "%.0f" % (time.time() * 1000000000),
             "Uncaught Exception: {0}".format(e),
+            "%.0f" % (time.time() * 1000000000),
+            request.method,
             request.full_path,
         )
 
@@ -285,8 +293,9 @@ def product_delete():
         status = 500
 
         print_json_log(
-            "%.0f" % (time.time() * 1000000000),
             "Uncaught Exception: {0}".format(e),
+            "%.0f" % (time.time() * 1000000000),
+            request.method,
             request.full_path,
         )
 
@@ -313,8 +322,9 @@ def product_language_add():
         status = 500
 
         print_json_log(
-            "%.0f" % (time.time() * 1000000000),
             "Uncaught Exception: {0}".format(e),
+            "%.0f" % (time.time() * 1000000000),
+            request.method,
             request.full_path,
         )
     return Response(data, mimetype="text/xml"), status
@@ -339,8 +349,9 @@ def product_language_delete():
         status = 500
 
         print_json_log(
-            "%.0f" % (time.time() * 1000000000),
             "Uncaught Exception: {0}".format(e),
+            "%.0f" % (time.time() * 1000000000),
+            request.method,
             request.full_path,
         )
     return Response(data, mimetype="text/xml"), status
@@ -383,8 +394,9 @@ def uptake():
         status = 500
 
         print_json_log(
-            "%.0f" % (time.time() * 1000000000),
             "Uncaught Exception: {0}".format(e),
+            "%.0f" % (time.time() * 1000000000),
+            request.method,
             request.full_path,
         )
     return Response(data, mimetype="text/xml"), status
@@ -417,8 +429,9 @@ def create_update_alias():
         status = 500
 
         print_json_log(
-            "%.0f" % (time.time() * 1000000000),
             "Uncaught Exception: {0}".format(e),
+            "%.0f" % (time.time() * 1000000000),
+            request.method,
             request.full_path,
         )
     return Response(data, mimetype="text/xml"), status
