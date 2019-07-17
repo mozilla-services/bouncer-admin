@@ -73,7 +73,7 @@ def location_show():
     xml = xmlrenderer.XMLRenderer()
 
     product = request.args.get("product")
-    fuzzy = request.args.get("fuzzy") == "True"
+    fuzzy = request.args.get("fuzzy", "").lower() == "true"
     if product is None:
         data = xml.error("The GET parameter product is required", errno=103)
         return Response(data, mimetype="text/xml"), 400
@@ -178,7 +178,7 @@ def product_show():
     xml = xmlrenderer.XMLRenderer()
 
     product = request.args.get("product")
-    fuzzy = request.args.get("fuzzy") == "True"
+    fuzzy = request.args.get("fuzzy", "").lower() == "true"
     try:
         res = msm.product_show(product, fuzzy)
         xml.prepare_products(res)
@@ -198,7 +198,7 @@ def product_add():
 
     product = request.form.get("product", None)
     languages = request.form.getlist("languages", None)
-    ssl_only = request.form.get("ssl_only") == "True"
+    ssl_only = request.form.get("ssl_only", "").lower() == "true"
     try:
         res = msm.product_add(product, languages, ssl_only)
         xml.prepare_products(res)
@@ -298,7 +298,7 @@ def uptake():
 
     product = request.args.get("product")
     os = request.args.get("os")
-    fuzzy = request.args.get("fuzzy") == "True"
+    fuzzy = request.args.get("fuzzy", "").lower() == "true"
     if product is None and os is None:
         data = xml.error("product and/or os are required GET parameters.", errno=101)
         return Response(data, mimetype="text/xml"), 400
