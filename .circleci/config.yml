@@ -146,13 +146,13 @@ workflows:
   lint:
     jobs:
       - style
+  
+  security:
+    jobs:
+      - security
 
   build-test-deploy:
     jobs:
-      - security:
-          filters:
-            tags:
-              only: /.*/
       - build:
           filters:
             tags:
