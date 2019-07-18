@@ -19,6 +19,17 @@ jobs:
       - run:
           name: Black Python
           command: black --diff --check .
+  security:
+    docker:
+      - image: python:3
+    steps:
+      - checkout
+      - run:
+          name: Install bandit
+          command: pip install bandit==1.6.2
+      - run:
+          name: Bandit Security Check
+          command: bandit -r -ll nazgul/
   build:
     docker:
       - image: docker:stable-git
