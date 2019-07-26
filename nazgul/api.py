@@ -5,14 +5,17 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from nazgul.mysql_model import MySQLModel, ModelError
 import nazgul.xmlrenderer as xmlrenderer
 import urllib.parse
-import os, time, logging
+import os, time, logging, json
 
 bp = Blueprint("api", __name__, url_prefix="/api")
 hb = Blueprint("heartbeat", __name__)
 
 auth = HTTPBasicAuth()
 
-users = {"admin": generate_password_hash(os.environ.get("AUTH_PASS", "admin"))}
+usr_imp = json.loads(os.environ.get("AUTH_USERS", '{"admin":"admin"}'))
+users = dict()
+for usr in usr_imp:
+    users[usr] = generate_password_hash(usr_imp[usr])
 
 test_db = os.environ.get("DATABASE_URL", "127.0.0.1")
 username = os.environ.get("DB_USER", "root")
