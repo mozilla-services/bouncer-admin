@@ -20,7 +20,7 @@ for usr in usr_imp:
 test_db = os.environ.get("DATABASE_URL", "127.0.0.1")
 username = os.environ.get("DB_USER", "root")
 password = os.environ.get("DB_PASS", "")
-msm = MySQLModel(host=test_db, user=username, password=password, pool_size=pool_size)
+msm = MySQLModel(host=test_db, user=username, password=password)
 
 # Setup logging
 logger = logging.getLogger("nazgul")
