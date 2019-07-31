@@ -3,15 +3,13 @@ import mysql.connector
 
 
 class MySQLModel:
-    def __init__(
-        self, user="root", host="127.0.0.1", password="", db="bouncer"
-    ):
+    def __init__(self, user="root", host="127.0.0.1", password="", db="bouncer"):
         self.db_config = {
             "database": db,
             "user": user,
             "password": password,
             "host": host,
-            "autocommit": True
+            "autocommit": True,
         }
         # TODO: Should I have autocommit always True?
         self._db = mysql.connector.connect(**self.db_config)
