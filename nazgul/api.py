@@ -32,6 +32,21 @@ fh.setLevel(logging.DEBUG)
 logger.addHandler(fh)
 
 
+class StructuredMessage(object):
+    def __init__(self, message, **kwargs):
+        self.message = message
+        self.kwargs = kwargs
+
+    def __str__(self):
+        return "%s >>> %s" % (self.message, json.dumps(self.kwargs))
+
+
+def print_json_log(message, time, method, path):
+    fields = {"method": method, "msg": message, "path": path}
+
+    print(StructuredMessage(message, Timestamp=time, Fields=fields))
+
+
 @auth.verify_password
 def verify_password(username, password):
     if username in users:
@@ -88,10 +103,16 @@ def location_show():
             xml.prepare_locations(product, locations)
         data = xml.render()
         status = 200
-    except Exception:
+    except Exception as e:
         data = xml.error("Unknown error")
         status = 500
 
+        print_json_log(
+            "Uncaught Exception: {0}".format(e),
+            "%.0f" % (time.time() * 1000000000),
+            request.method,
+            request.full_path,
+        )
     return Response(data, mimetype="text/xml"), status
 
 
@@ -119,9 +140,16 @@ def location_add():
     except ModelError as e:
         data = xml.error(e.message, errno=e.errno)
         status = 400
-    except Exception:
+    except Exception as e:
         data = xml.error("Unknown error")
         status = 500
+
+        print_json_log(
+            "Uncaught Exception: {0}".format(e),
+            "%.0f" % (time.time() * 1000000000),
+            request.method,
+            request.full_path,
+        )
 
     return Response(data, mimetype="text/xml"), status
 
@@ -144,9 +172,16 @@ def location_modify():
     except ModelError as e:
         data = xml.error(e.message, errno=e.errno)
         status = 400
-    except Exception:
+    except Exception as e:
         data = xml.error("Unknown error")
         status = 500
+
+        print_json_log(
+            "Uncaught Exception: {0}".format(e),
+            "%.0f" % (time.time() * 1000000000),
+            request.method,
+            request.full_path,
+        )
 
     return Response(data, mimetype="text/xml"), status
 
@@ -168,9 +203,16 @@ def location_delete():
     except ModelError as e:
         data = xml.error(e.message, errno=e.errno)
         status = 400
-    except Exception:
+    except Exception as e:
         data = xml.error("Unknown error")
         status = 500
+
+        print_json_log(
+            "Uncaught Exception: {0}".format(e),
+            "%.0f" % (time.time() * 1000000000),
+            request.method,
+            request.full_path,
+        )
     return Response(data, mimetype="text/xml"), status
 
 
@@ -186,9 +228,16 @@ def product_show():
         xml.prepare_products(res)
         data = xml.render()
         status = 200
-    except Exception:
+    except Exception as e:
         data = xml.error("Unknown error")
         status = 500
+
+        print_json_log(
+            "Uncaught Exception: {0}".format(e),
+            "%.0f" % (time.time() * 1000000000),
+            request.method,
+            request.full_path,
+        )
 
     return Response(data, mimetype="text/xml"), status
 
@@ -209,9 +258,16 @@ def product_add():
     except ModelError as e:
         data = xml.error(e.message, errno=e.errno)
         status = 400
-    except Exception:
+    except Exception as e:
         data = xml.error("Unknown error")
         status = 500
+
+        print_json_log(
+            "Uncaught Exception: {0}".format(e),
+            "%.0f" % (time.time() * 1000000000),
+            request.method,
+            request.full_path,
+        )
 
     return Response(data, mimetype="text/xml"), status
 
@@ -234,9 +290,16 @@ def product_delete():
     except ModelError as e:
         data = xml.error(e.message, errno=e.errno)
         status = 400
-    except Exception:
+    except Exception as e:
         data = xml.error("Unknown error")
         status = 500
+
+        print_json_log(
+            "Uncaught Exception: {0}".format(e),
+            "%.0f" % (time.time() * 1000000000),
+            request.method,
+            request.full_path,
+        )
 
     return Response(data, mimetype="text/xml"), status
 
@@ -256,9 +319,16 @@ def product_language_add():
     except ModelError as e:
         data = xml.error(e.message, errno=e.errno)
         status = 400
-    except Exception:
+    except Exception as e:
         data = xml.error("Unknown error")
         status = 500
+
+        print_json_log(
+            "Uncaught Exception: {0}".format(e),
+            "%.0f" % (time.time() * 1000000000),
+            request.method,
+            request.full_path,
+        )
     return Response(data, mimetype="text/xml"), status
 
 
@@ -276,9 +346,16 @@ def product_language_delete():
     except ModelError as e:
         data = xml.error(e.message, errno=e.errno)
         status = 400
-    except Exception:
+    except Exception as e:
         data = xml.error("Unknown error")
         status = 500
+
+        print_json_log(
+            "Uncaught Exception: {0}".format(e),
+            "%.0f" % (time.time() * 1000000000),
+            request.method,
+            request.full_path,
+        )
     return Response(data, mimetype="text/xml"), status
 
 
@@ -314,9 +391,16 @@ def uptake():
         # Error no. for /uptake is always 102 in Tuxedo (Should this be changed in Nazgul?)
         data = xml.error(e.message, errno=102)
         status = 400
-    except Exception:
+    except Exception as e:
         data = xml.error("Unknown error")
         status = 500
+
+        print_json_log(
+            "Uncaught Exception: {0}".format(e),
+            "%.0f" % (time.time() * 1000000000),
+            request.method,
+            request.full_path,
+        )
     return Response(data, mimetype="text/xml"), status
 
 
@@ -342,7 +426,14 @@ def create_update_alias():
     except ModelError as e:
         data = xml.error(e.message, errno=e.errno)
         status = 400
-    except Exception:
+    except Exception as e:
         data = xml.error("Unknown error")
         status = 500
+
+        print_json_log(
+            "Uncaught Exception: {0}".format(e),
+            "%.0f" % (time.time() * 1000000000),
+            request.method,
+            request.full_path,
+        )
     return Response(data, mimetype="text/xml"), status
