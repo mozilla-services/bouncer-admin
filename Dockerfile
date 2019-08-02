@@ -1,4 +1,4 @@
-FROM python:3.7
+FROM python:3.7-stretch
 
 WORKDIR /app
 
@@ -10,7 +10,7 @@ EXPOSE 5000
 ENV FLASK_APP nazgul.py
 ENV FLASK_ENV production
 ENV DATABASE_URL=host.docker.internal
-ENV AUTH_PASS=admin
+ENV AUTH_USERS="{\"admin\":\"admin\"}"
 
 COPY . /app
 CMD ["python3", "main.py"]

@@ -9,7 +9,7 @@ msm._reset_db()
 
 test_user = "admin"
 test_pass = "test"
-os.environ["AUTH_PASS"] = test_pass
+os.environ["AUTH_USERS"] = '{"' + test_user + '":"' + test_pass + '"}'
 
 
 def test_location_show_exact_match(client):
