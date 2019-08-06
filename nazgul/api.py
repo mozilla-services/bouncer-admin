@@ -50,23 +50,23 @@ def verify_password(username, password):
 @hb.route("/", methods=["GET", "POST"])
 @auth.login_required
 def home():
-    return "Nazgul"
+    return Response("Nazgul", mimetype="text/plain")
 
 
 @hb.route("/__heartbeat__", methods=["GET"])
 def heartbeat():
-    return "OK"
+    return Response("OK", mimetype="text/plain")
 
 
 @hb.route("/__lbheartbeat__", methods=["GET"])
 def lbheartbeat():
-    return "OK"
+    return Response("OK", mimetype="text/plain")
 
 
 @bp.route("/", methods=["GET", "POST"])
 @auth.login_required
 def index():
-    return "Nazgul API"
+    return Response("Nazgul API", mimetype="text/plain")
 
 
 @bp.route("/location_show/", methods=["GET"])
