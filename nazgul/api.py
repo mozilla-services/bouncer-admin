@@ -34,6 +34,7 @@ fh.setLevel(logging.DEBUG)
 
 logger.addHandler(fh)
 
+
 def verify_content_length(max_length):
     return request.content_length and request.content_length <= max_length
 
@@ -105,7 +106,7 @@ def location_show():
 @auth.login_required
 def location_add():
     xml = xmlrenderer.XMLRenderer()
-    
+
     if not verify_content_length(POST_SIZE_LIMIT):
         data = xml.error("POST request length exceeded 500KB", errno=101)
         return Response(data, mimetype="text/xml"), 400
