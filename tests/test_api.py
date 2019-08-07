@@ -361,3 +361,14 @@ def test_create_update_alias(client):
     expected = b'<?xml version="1.0" encoding="utf-8"?><success>Created/updated alias aaron-product</success>'
     msm._reset_db()
     assert expected == rv.data
+
+def test_content_length_limit(client):
+    f = open("tests/dummytestdata.txt", "r")
+    dummydata = f.read()
+    rv = client.post(
+        "api/location_add/",
+        data=dict(product="FakeProduct", path="/test_path", os="osx", testfile=dummydata),
+        headers={"Authorization": requests.auth._basic_auth_str(test_user, test_pass)},
+    )
+    expected = b'<?xml version="1.0" encoding="utf-8"?><error number="101">POST request length exceeded 500KB</error>'
+    assert expected == rv.data

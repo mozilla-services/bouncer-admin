@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, Response, Blueprint
 from flask_httpauth import HTTPBasicAuth
 from werkzeug.security import generate_password_hash, check_password_hash
+from functools import wraps
 
 from nazgul.mysql_model import MySQLModel, ModelError
 import nazgul.xmlrenderer as xmlrenderer
@@ -9,6 +10,8 @@ import os, time, logging, json
 
 bp = Blueprint("api", __name__, url_prefix="/api")
 hb = Blueprint("heartbeat", __name__)
+
+POST_SIZE_LIMIT = 500 * 1024
 
 auth = HTTPBasicAuth()
 
@@ -30,6 +33,9 @@ fh = logging.FileHandler("nazgul.log")
 fh.setLevel(logging.DEBUG)
 
 logger.addHandler(fh)
+
+def verify_content_length(max_length):
+    return request.content_length and request.content_length <= max_length
 
 
 @auth.verify_password
@@ -99,6 +105,10 @@ def location_show():
 @auth.login_required
 def location_add():
     xml = xmlrenderer.XMLRenderer()
+    
+    if not verify_content_length(POST_SIZE_LIMIT):
+        data = xml.error("POST request length exceeded 500KB", errno=101)
+        return Response(data, mimetype="text/xml"), 400
 
     product = request.form.get("product", None)
     os = request.form.get("os", None)
@@ -131,6 +141,10 @@ def location_add():
 def location_modify():
     xml = xmlrenderer.XMLRenderer()
 
+    if not verify_content_length(POST_SIZE_LIMIT):
+        data = xml.error("POST request length exceeded 500KB", errno=101)
+        return Response(data, mimetype="text/xml"), 400
+
     product = request.form.get("product", None)
     os = request.form.get("os", None)
     path = request.form.get("path", None)
@@ -155,6 +169,10 @@ def location_modify():
 @auth.login_required
 def location_delete():
     xml = xmlrenderer.XMLRenderer()
+
+    if not verify_content_length(POST_SIZE_LIMIT):
+        data = xml.error("POST request length exceeded 500KB", errno=101)
+        return Response(data, mimetype="text/xml"), 400
 
     location_id = request.form.get("location_id", None)
     if not location_id:
@@ -198,6 +216,10 @@ def product_show():
 def product_add():
     xml = xmlrenderer.XMLRenderer()
 
+    if not verify_content_length(POST_SIZE_LIMIT):
+        data = xml.error("POST request length exceeded 500KB", errno=101)
+        return Response(data, mimetype="text/xml"), 400
+
     product = request.form.get("product", None)
     languages = request.form.getlist("languages", None)
     ssl_only = request.form.get("ssl_only", "").lower() == "true"
@@ -220,6 +242,10 @@ def product_add():
 @auth.login_required
 def product_delete():
     xml = xmlrenderer.XMLRenderer()
+
+    if not verify_content_length(POST_SIZE_LIMIT):
+        data = xml.error("POST request length exceeded 500KB", errno=101)
+        return Response(data, mimetype="text/xml"), 400
 
     product = request.form.get("product", None)
     product_id = request.form.get("product_id", None)
@@ -246,6 +272,10 @@ def product_delete():
 def product_language_add():
     xml = xmlrenderer.XMLRenderer()
 
+    if not verify_content_length(POST_SIZE_LIMIT):
+        data = xml.error("POST request length exceeded 500KB", errno=101)
+        return Response(data, mimetype="text/xml"), 400
+
     product = request.form.get("product", None)
     languages = request.form.getlist("languages", None)
     try:
@@ -266,6 +296,10 @@ def product_language_add():
 @auth.login_required
 def product_language_delete():
     xml = xmlrenderer.XMLRenderer()
+
+    if not verify_content_length(POST_SIZE_LIMIT):
+        data = xml.error("POST request length exceeded 500KB", errno=101)
+        return Response(data, mimetype="text/xml"), 400
 
     product = request.form.get("product", None)
     languages = request.form.getlist("languages", None)
@@ -324,6 +358,10 @@ def uptake():
 @auth.login_required
 def create_update_alias():
     xml = xmlrenderer.XMLRenderer()
+
+    if not verify_content_length(POST_SIZE_LIMIT):
+        data = xml.error("POST request length exceeded 500KB", errno=101)
+        return Response(data, mimetype="text/xml"), 400
 
     alias = request.form.get("alias", None)
     related_product = request.form.get("related_product", None)
