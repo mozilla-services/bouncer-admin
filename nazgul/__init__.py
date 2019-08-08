@@ -23,6 +23,7 @@ def create_app(test_config=None):
 
     from . import api, mysql_model, xmlrenderer
 
+    app.config["MAX_CONTENT_LENGTH"] = 500 * 1024
     app.register_blueprint(api.bp)
 
     return app

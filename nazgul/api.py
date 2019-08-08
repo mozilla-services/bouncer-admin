@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, Response, Blueprint
 from flask_httpauth import HTTPBasicAuth
 from werkzeug.security import generate_password_hash, check_password_hash
+from functools import wraps
 
 from nazgul.mysql_model import MySQLModel, ModelError
 import nazgul.xmlrenderer as xmlrenderer
@@ -30,6 +31,13 @@ fh = logging.FileHandler("nazgul.log")
 fh.setLevel(logging.DEBUG)
 
 logger.addHandler(fh)
+
+
+@bp.errorhandler(413)
+def request_entity_too_large(error):
+    xml = xmlrenderer.XMLRenderer()
+    data = xml.error("POST request length exceeded 500KB", errno=101)
+    return Response(data, mimetype="text/xml"), 413
 
 
 @auth.verify_password
