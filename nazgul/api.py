@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, Response, Blueprint
+from flask import Flask, render_template, request, Response, Blueprint, redirect
 from flask_httpauth import HTTPBasicAuth
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
@@ -32,6 +32,13 @@ fh.setLevel(logging.DEBUG)
 
 logger.addHandler(fh)
 
+@bp.before_request
+@hb.before_request
+def before_request():
+    if request.url.startswith('http://'):
+        url = request.url.replace('http://', 'https://', 1)
+        code = 301
+        return redirect(url, code=code)
 
 @bp.errorhandler(413)
 def request_entity_too_large(error):
