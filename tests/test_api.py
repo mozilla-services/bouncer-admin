@@ -373,6 +373,5 @@ def test_content_length_limit(client):
         ),
         headers={"Authorization": requests.auth._basic_auth_str(test_user, test_pass)},
     )
-    print(rv.data)
     expected = b'<?xml version="1.0" encoding="utf-8"?><error number="101">POST request length exceeded 500KB</error>'
     assert expected == rv.data
