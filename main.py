@@ -8,4 +8,5 @@ if __name__ == "__main__":
     app.register_blueprint(api.bp)
     app.register_blueprint(api.hb)
     app.url_map.strict_slashes = False
+    app.config["MAX_CONTENT_LENGTH"] = 500 * 1024
     app.run(host="0.0.0.0", port=os.environ.get("PORT", 5000))
