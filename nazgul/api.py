@@ -55,7 +55,7 @@ def verify_password(username, password):
     return False
 
 
-@hb.route("/", methods=["GET", "POST"])
+@hb.route("/", methods=["GET"])
 def home():
     return Response("Nazgul", mimetype="text/plain")
 
@@ -70,7 +70,7 @@ def lbheartbeat():
     return Response("OK", mimetype="text/plain")
 
 
-@bp.route("/", methods=["GET", "POST"])
+@bp.route("/", methods=["GET"])
 def index():
     return Response("Nazgul API", mimetype="text/plain")
 
