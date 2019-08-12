@@ -55,8 +55,7 @@ def verify_password(username, password):
     return False
 
 
-@hb.route("/", methods=["GET", "POST"])
-@auth.login_required
+@hb.route("/", methods=["GET"])
 def home():
     return Response("Nazgul", mimetype="text/plain")
 
@@ -71,14 +70,12 @@ def lbheartbeat():
     return Response("OK", mimetype="text/plain")
 
 
-@bp.route("/", methods=["GET", "POST"])
-@auth.login_required
+@bp.route("/", methods=["GET"])
 def index():
     return Response("Nazgul API", mimetype="text/plain")
 
 
 @bp.route("/location_show/", methods=["GET"])
-@auth.login_required
 def location_show():
     xml = xmlrenderer.XMLRenderer()
 
@@ -183,7 +180,6 @@ def location_delete():
 
 
 @bp.route("/product_show/", methods=["GET"])
-@auth.login_required
 def product_show():
     xml = xmlrenderer.XMLRenderer()
 
@@ -291,7 +287,6 @@ def product_language_delete():
 
 
 @bp.route("/mirror_list/", methods=["GET"])
-@auth.login_required
 def mirror_list():
     xml = xmlrenderer.XMLRenderer()
 
@@ -302,7 +297,6 @@ def mirror_list():
 
 
 @bp.route("/uptake/", methods=["GET"])
-@auth.login_required
 def uptake():
     xml = xmlrenderer.XMLRenderer()
 
