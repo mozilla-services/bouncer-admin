@@ -76,6 +76,7 @@ def index():
 
 
 @bp.route("/location_show/", methods=["GET"])
+@bp.route("/location_show", methods=["GET"])
 def location_show():
     xml = xmlrenderer.XMLRenderer()
 
@@ -101,6 +102,7 @@ def location_show():
 
 
 @bp.route("/location_add/", methods=["POST"])
+@bp.route("/location_add", methods=["POST"])
 @auth.login_required
 def location_add():
     xml = xmlrenderer.XMLRenderer()
@@ -132,6 +134,7 @@ def location_add():
 
 
 @bp.route("/location_modify/", methods=["POST"])
+@bp.route("/location_modify", methods=["POST"])
 @auth.login_required
 def location_modify():
     xml = xmlrenderer.XMLRenderer()
@@ -157,6 +160,7 @@ def location_modify():
 
 
 @bp.route("/location_delete/", methods=["POST"])
+@bp.route("/location_delete", methods=["POST"])
 @auth.login_required
 def location_delete():
     xml = xmlrenderer.XMLRenderer()
@@ -180,6 +184,7 @@ def location_delete():
 
 
 @bp.route("/product_show/", methods=["GET"])
+@bp.route("/product_show", methods=["GET"])
 def product_show():
     xml = xmlrenderer.XMLRenderer()
 
@@ -198,6 +203,7 @@ def product_show():
 
 
 @bp.route("/product_add/", methods=["POST"])
+@bp.route("/product_add", methods=["POST"])
 @auth.login_required
 def product_add():
     xml = xmlrenderer.XMLRenderer()
@@ -221,6 +227,7 @@ def product_add():
 
 
 @bp.route("/product_delete/", methods=["POST"])
+@bp.route("/product_delete", methods=["POST"])
 @auth.login_required
 def product_delete():
     xml = xmlrenderer.XMLRenderer()
@@ -246,6 +253,7 @@ def product_delete():
 
 
 @bp.route("/product_language_add/", methods=["POST"])
+@bp.route("/product_language_add", methods=["POST"])
 @auth.login_required
 def product_language_add():
     xml = xmlrenderer.XMLRenderer()
@@ -267,6 +275,7 @@ def product_language_add():
 
 
 @bp.route("/product_language_delete/", methods=["POST"])
+@bp.route("/product_language_delete", methods=["POST"])
 @auth.login_required
 def product_language_delete():
     xml = xmlrenderer.XMLRenderer()
@@ -287,6 +296,7 @@ def product_language_delete():
 
 
 @bp.route("/mirror_list/", methods=["GET"])
+@bp.route("/mirror_list", methods=["GET"])
 def mirror_list():
     xml = xmlrenderer.XMLRenderer()
 
@@ -297,6 +307,7 @@ def mirror_list():
 
 
 @bp.route("/uptake/", methods=["GET"])
+@bp.route("/uptake", methods=["GET"])
 def uptake():
     xml = xmlrenderer.XMLRenderer()
 
@@ -323,6 +334,7 @@ def uptake():
 
 
 @bp.route("/create_update_alias/", methods=["POST"])
+@bp.route("/create_update_alias", methods=["POST"])
 @auth.login_required
 def create_update_alias():
     xml = xmlrenderer.XMLRenderer()
