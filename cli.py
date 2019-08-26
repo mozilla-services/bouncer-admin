@@ -259,7 +259,7 @@ def product_add(product, languages, ssl_only):
 
 
 def product_delete(product, product_id):
-    if not product:
+    if product is not None:
         data = str.encode("product=" + product)
     else:
         data = str.encode("product_id=" + product_id)
@@ -290,10 +290,13 @@ def product_language_add(product, languages):
 
 
 def product_language_delete(product, languages):
-    langs = languages.split(",")
     data = "product=" + product
-    for lang in langs:
-        data += "&languages=" + lang
+    if languages == '*':
+        data += "&languages=" + languages
+    else:
+        langs = languages.split(",")
+        for lang in langs:
+            data += "&languages=" + lang
     data = str.encode(data)
     http = urllib3.PoolManager()
     headers = urllib3.util.make_headers(basic_auth=username + ":" + password)
