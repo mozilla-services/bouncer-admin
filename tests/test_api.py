@@ -2,7 +2,7 @@ import pytest
 import requests
 from nazgul import create_app, mysql_model
 import cli
-import os
+import os, subprocess
 
 test_db = os.environ.get("DATABASE_URL", "127.0.0.1")
 msm = mysql_model.MySQLModel(host=test_db)
@@ -11,6 +11,7 @@ msm._reset_db()
 test_user = "admin"
 test_pass = "test"
 os.environ["AUTH_USERS"] = '{"' + test_user + '":"' + test_pass + '"}'
+
 
 def test_location_show_exact_match(client):
     rv = client.get(
@@ -376,11 +377,9 @@ def test_content_length_limit(client):
     expected = b'<?xml version="1.0" encoding="utf-8"?><error number="101">POST request length exceeded 500KB</error>'
     assert expected == rv.data
 
-# def test_cli_main(client):
-#     rv = cli.main()
 
 def test_cli_location_show_exact_match(client):
-    rv = cli.location_show('Firefox', False)
+    rv = cli.location_show("Firefox", False)
     expected = b'<?xml version="1.0" encoding="utf-8"?><locations><product id="1" name="Firefox"><location id="1" os="win64">/firefox/releases/39.0/win64/:lang/Firefox%20Setup%2039.0.exe</location><location id="2" os="osx">/firefox/releases/39.0/mac/:lang/Firefox%2039.0.dmg</location><location id="3" os="win">/firefox/releases/39.0/win32/:lang/Firefox%20Setup%2039.0.exe</location></product></locations>'
     assert expected == rv
 
@@ -416,25 +415,25 @@ def test_cli_mirror_list(client):
 
 
 def test_cli_location_add_product_not_found(client):
-    rv = cli.location_add('FakeProduct', 'osx', '/test_path')
+    rv = cli.location_add("FakeProduct", "osx", "/test_path")
     expected = b'<?xml version="1.0" encoding="utf-8"?><error number="105">FAILED: \'FakeProduct\' does not exist</error>'
     assert expected == rv
 
 
 def test_cli_location_add_os_not_found(client):
-    rv = cli.location_add('Firefox', "fake", '/test_path')
+    rv = cli.location_add("Firefox", "fake", "/test_path")
     expected = b'<?xml version="1.0" encoding="utf-8"?><error number="106">FAILED: \'fake\' does not exist</error>'
     assert expected == rv
 
 
 def test_cli_location_add_location_exists(client):
-    rv = cli.location_add('Firefox', 'osx', '/test_path')
+    rv = cli.location_add("Firefox", "osx", "/test_path")
     expected = b'<?xml version="1.0" encoding="utf-8"?><error number="104">The specified location already exists.</error>'
     assert expected == rv
 
 
 def test_cli_location_add(client):
-    rv = cli.location_add('AaronProduct', 'win64', '/test_path')
+    rv = cli.location_add("AaronProduct", "win64", "/test_path")
     location_exits, location_id = msm.location_exists("win64", "AaronProduct")
     msm._reset_db()
     if location_exits:
@@ -465,25 +464,25 @@ def test_cli_location_delete(client):
 
 
 def test_cli_location_modify_invalid_product(client):
-    rv = cli.location_modify('FakeProduct', 'osx', '/newpath')
+    rv = cli.location_modify("FakeProduct", "osx", "/newpath")
     expected = b'<?xml version="1.0" encoding="utf-8"?><error number="105">FAILED: \'FakeProduct\' does not exist</error>'
     assert expected == rv
 
 
 def test_cli_location_modify_invalid_os(client):
-    rv = cli.location_modify('Firefox', 'fakeos', '/newpath')
+    rv = cli.location_modify("Firefox", "fakeos", "/newpath")
     expected = b'<?xml version="1.0" encoding="utf-8"?><error number="106">FAILED: \'fakeos\' does not exist</error>'
     assert expected == rv
 
 
 def test_cli_location_modify_invalid_location(client):
-    rv = cli.location_modify("AaronProduct", 'win', '/newpath')
+    rv = cli.location_modify("AaronProduct", "win", "/newpath")
     expected = b'<?xml version="1.0" encoding="utf-8"?><error number="104">FAILED: location \'AaronProduct\' on OS \'win\' does not exist</error>'
     assert expected == rv
 
 
 def test_cli_location_modify(client):
-    rv = cli.location_modify('AaronProduct', 'osx', '/newpath')
+    rv = cli.location_modify("AaronProduct", "osx", "/newpath")
     expected = b'<?xml version="1.0" encoding="utf-8"?><locations><product id="4556" name="AaronProduct"><location id="23194" os="osx">/newpath</location></product></locations>'
     msm._reset_db()
     assert expected == rv
@@ -514,7 +513,7 @@ def test_cli_product_show_fuzzy_no_match(client):
 
 
 def test_cli_product_add_no_match(client):
-    rv = cli.product_add("AaronProduct", 'en-GB', False)
+    rv = cli.product_add("AaronProduct", "en-GB", False)
     expected = b'<?xml version="1.0" encoding="utf-8"?><error number="104">product already exists.</error>'
     assert expected == rv
 
@@ -580,19 +579,50 @@ def test_cli_product_language_delete_no_match(client):
 
 
 def test_cli_create_update_alias_no_product_match(client):
-    rv = cli.create_update_alias('aaron-product', 'FakeProduct')
+    rv = cli.create_update_alias("aaron-product", "FakeProduct")
     expected = b'<?xml version="1.0" encoding="utf-8"?><error number="103">You must specify a valid product to match with an alias</error>'
     assert expected == rv
 
 
 def test_cli_create_update_alias_alias_product_name_collision(client):
-    rv = cli.create_update_alias('Firefox', "AaronProduct")
+    rv = cli.create_update_alias("Firefox", "AaronProduct")
     expected = b'<?xml version="1.0" encoding="utf-8"?><error number="104">You cannot create an alias with the same name as a product</error>'
     assert expected == rv
 
 
 def test_cli_create_update_alias(client):
-    rv = cli.create_update_alias('aaron-product', "AaronProduct")
+    rv = cli.create_update_alias("aaron-product", "AaronProduct")
     expected = b'<?xml version="1.0" encoding="utf-8"?><success>Created/updated alias aaron-product</success>'
     msm._reset_db()
     assert expected == rv
+
+
+def test_cli_function_exists(client):
+    subprocess.run(["./cli.py", "location_add"])
+    subprocess.run(["./cli.py", "location_modify"])
+    subprocess.run(["./cli.py", "location_delete"])
+    subprocess.run(["./cli.py", "product_show"])
+    subprocess.run(["./cli.py", "product_add"])
+    subprocess.run(["./cli.py", "product_delete"])
+    subprocess.run(["./cli.py", "product_language_add"])
+    subprocess.run(["./cli.py", "product_language_delete"])
+    subprocess.run(["./cli.py", "uptake"])
+    subprocess.run(["./cli.py", "create_update_alias"])
+
+    assert True
+
+
+def test_cli_usage(client):
+    subprocess.run(["./cli.py", "location_add", "-h"])
+    subprocess.run(["./cli.py", "location_modify", "-h"])
+    subprocess.run(["./cli.py", "location_delete", "-h"])
+    subprocess.run(["./cli.py", "product_show", "-h"])
+    subprocess.run(["./cli.py", "product_add", "-h"])
+    subprocess.run(["./cli.py", "product_delete", "-h"])
+    subprocess.run(["./cli.py", "product_language_add", "-h"])
+    subprocess.run(["./cli.py", "product_language_delete", "-h"])
+    subprocess.run(["./cli.py", "uptake", "-h"])
+    subprocess.run(["./cli.py", "create_update_alias", "-h"])
+    subprocess.run(["./cli.py", "mirror_list", "-h"])
+
+    assert True

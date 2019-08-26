@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import os, click, base64, urllib3
 import xml.dom.minidom
 
@@ -291,7 +292,7 @@ def product_language_add(product, languages):
 
 def product_language_delete(product, languages):
     data = "product=" + product
-    if languages == '*':
+    if languages == "*":
         data += "&languages=" + languages
     else:
         langs = languages.split(",")
