@@ -377,252 +377,67 @@ def test_content_length_limit(client):
     expected = b'<?xml version="1.0" encoding="utf-8"?><error number="101">POST request length exceeded 500KB</error>'
     assert expected == rv.data
 
-
-def test_cli_location_show_exact_match(client):
-    rv = cli.location_show("Firefox", False)
-    expected = b'<?xml version="1.0" encoding="utf-8"?><locations><product id="1" name="Firefox"><location id="1" os="win64">/firefox/releases/39.0/win64/:lang/Firefox%20Setup%2039.0.exe</location><location id="2" os="osx">/firefox/releases/39.0/mac/:lang/Firefox%2039.0.dmg</location><location id="3" os="win">/firefox/releases/39.0/win32/:lang/Firefox%20Setup%2039.0.exe</location></product></locations>'
-    assert expected == rv
-
-
-def test_cli_location_show_exact_no_match(client):
-    rv = cli.location_show("NoMatch", False)
-    expected = b'<?xml version="1.0" encoding="utf-8"?>'
-    assert expected == rv
-
-
-def test_cli_location_show_fuzzy_match(client):
-    rv = cli.location_show("Firefox", True)
-    expected = b'<?xml version="1.0" encoding="utf-8"?><locations><product id="1" name="Firefox"><location id="1" os="win64">/firefox/releases/39.0/win64/:lang/Firefox%20Setup%2039.0.exe</location><location id="2" os="osx">/firefox/releases/39.0/mac/:lang/Firefox%2039.0.dmg</location><location id="3" os="win">/firefox/releases/39.0/win32/:lang/Firefox%20Setup%2039.0.exe</location></product><product id="3" name="Firefox-43.0.1-SSL"><location id="7" os="win64">/firefox/releases/43.0.1/win64/:lang/Firefox%20Setup%2043.0.1.exe</location><location id="8" os="osx">/firefox/releases/43.0.1/mac/:lang/Firefox%2043.0.1.dmg</location><location id="9" os="win">/firefox/releases/43.0.1/win32/:lang/Firefox%20Setup%2043.0.1.exe</location></product><product id="2" name="Firefox-SSL"><location id="4" os="win64">/firefox/releases/39.0/win64/:lang/Firefox%20Setup%2039.0.exe</location><location id="5" os="osx">/firefox/releases/39.0/mac/:lang/Firefox%2039.0.dmg</location><location id="6" os="win">/firefox/releases/39.0/win32/:lang/Firefox%20Setup%2039.0.exe</location></product></locations>'
-    assert expected == rv
-
-
-def test_cli_location_show_fuzzy_no_match(client):
-    rv = cli.location_show("NoMatch", True)
-    expected = b'<?xml version="1.0" encoding="utf-8"?>'
-    assert expected == rv
-
-
-def test_cli_uptake(client):
-    rv = cli.uptake("Firefox", "osx", True)
-    expected = b'<?xml version="1.0" encoding="utf-8"?><mirror_uptake><item><product>Firefox</product><os>osx</os><available>2000000</available><total>2000000</total></item><item><product>Firefox-43.0.1-SSL</product><os>osx</os><available>2000000</available><total>2000000</total></item><item><product>Firefox-SSL</product><os>osx</os><available>2000000</available><total>2000000</total></item></mirror_uptake>'
-    assert expected == rv
-
-
-def test_cli_mirror_list(client):
-    rv = cli.mirror_list()
-    expected = b'<?xml version="1.0" encoding="utf-8"?><mirrors><mirror baseurl="http://download-installer.cdn.mozilla.net/pub"/><mirror baseurl="https://download-installer.cdn.mozilla.net/pub"/></mirrors>'
-    assert expected == rv
-
-
-def test_cli_location_add_product_not_found(client):
-    rv = cli.location_add("FakeProduct", "osx", "/test_path")
-    expected = b'<?xml version="1.0" encoding="utf-8"?><error number="105">FAILED: \'FakeProduct\' does not exist</error>'
-    assert expected == rv
-
-
-def test_cli_location_add_os_not_found(client):
-    rv = cli.location_add("Firefox", "fake", "/test_path")
-    expected = b'<?xml version="1.0" encoding="utf-8"?><error number="106">FAILED: \'fake\' does not exist</error>'
-    assert expected == rv
-
-
-def test_cli_location_add_location_exists(client):
-    rv = cli.location_add("Firefox", "osx", "/test_path")
-    expected = b'<?xml version="1.0" encoding="utf-8"?><error number="104">The specified location already exists.</error>'
-    assert expected == rv
-
+def test_cli_location_show(client):
+    subprocess.run(["./cli.py", "location-show", "Firefox"])
+    assert True
 
 def test_cli_location_add(client):
-    rv = cli.location_add("AaronProduct", "win64", "/test_path")
-    location_exits, location_id = msm.location_exists("win64", "AaronProduct")
-    msm._reset_db()
-    if location_exits:
-        expected1 = b'<?xml version="1.0" encoding="utf-8"?><locations><product id="4556" name="AaronProduct"><location id="'
-        expected2 = b'" os="win64">/test_path</location><location id="23194" os="osx">/test</location></product></locations>'
-        assert expected1 in rv and expected2 in rv
-    else:
-        print("FAILED: test_location_add - Location not inserted into DB")
-        assert False
-
-
-def test_cli_location_delete_location_not_found(client):
-    rv = cli.location_delete("0")
-    expected = b'<?xml version="1.0" encoding="utf-8"?><error number="102">No location found.</error>'
-    assert expected == rv
-
-
-def test_cli_location_delete(client):
-    rv = cli.location_delete("23194")
-    location_exists, location_id = msm.location_exists("osx", "AaronProduct")
-    msm._reset_db()
-    if not location_exists:
-        expected = b'<?xml version="1.0" encoding="utf-8"?><success>SUCCESS: location has been deleted</success>'
-        assert expected == rv
-    else:
-        print("FAILED: test_location_delete - Location not deleted from DB")
-        assert False
-
-
-def test_cli_location_modify_invalid_product(client):
-    rv = cli.location_modify("FakeProduct", "osx", "/newpath")
-    expected = b'<?xml version="1.0" encoding="utf-8"?><error number="105">FAILED: \'FakeProduct\' does not exist</error>'
-    assert expected == rv
-
-
-def test_cli_location_modify_invalid_os(client):
-    rv = cli.location_modify("Firefox", "fakeos", "/newpath")
-    expected = b'<?xml version="1.0" encoding="utf-8"?><error number="106">FAILED: \'fakeos\' does not exist</error>'
-    assert expected == rv
-
-
-def test_cli_location_modify_invalid_location(client):
-    rv = cli.location_modify("AaronProduct", "win", "/newpath")
-    expected = b'<?xml version="1.0" encoding="utf-8"?><error number="104">FAILED: location \'AaronProduct\' on OS \'win\' does not exist</error>'
-    assert expected == rv
-
+    subprocess.run(["./cli.py", "location-add", "AaronProduct", "osx", "/test_path"])
+    assert True
 
 def test_cli_location_modify(client):
-    rv = cli.location_modify("AaronProduct", "osx", "/newpath")
-    expected = b'<?xml version="1.0" encoding="utf-8"?><locations><product id="4556" name="AaronProduct"><location id="23194" os="osx">/newpath</location></product></locations>'
-    msm._reset_db()
-    assert expected == rv
+    subprocess.run(["./cli.py", "location-modify", "AaronProduct", "osx", "/test_path"])
+    assert True
 
+def test_cli_location_delete(client):
+    subprocess.run(["./cli.py", "location-delete", "23194"])
+    assert True
 
-def test_cli_product_show_exact_match(client):
-    rv = cli.product_show("Firefox", False)
-    expected = b'<?xml version="1.0" encoding="utf-8"?><products><product id="1" name="Firefox"><language locale="en-GB"/><language locale="en-US"/></product></products>'
-    assert expected == rv
-
-
-def test_cli_product_show_exact_no_match(client):
-    rv = cli.product_show("NoMatch", False)
-    expected = b'<?xml version="1.0" encoding="utf-8"?><products/>'
-    assert expected == rv
-
-
-def test_cli_product_show_fuzzy_match(client):
-    rv = cli.product_show("Firefox", True)
-    expected = b'<?xml version="1.0" encoding="utf-8"?><products><product id="1" name="Firefox"><language locale="en-GB"/><language locale="en-US"/></product><product id="3" name="Firefox-43.0.1-SSL"><language locale="en-GB"/><language locale="en-US"/></product><product id="2" name="Firefox-SSL"><language locale="en-GB"/><language locale="en-US"/></product></products>'
-    assert expected == rv
-
-
-def test_cli_product_show_fuzzy_no_match(client):
-    rv = cli.product_show("NoMatch", True)
-    expected = b'<?xml version="1.0" encoding="utf-8"?><products/>'
-    assert expected == rv
-
-
-def test_cli_product_add_no_match(client):
-    rv = cli.product_add("AaronProduct", "en-GB", False)
-    expected = b'<?xml version="1.0" encoding="utf-8"?><error number="104">product already exists.</error>'
-    assert expected == rv
-
+def test_cli_product_show(client):
+    subprocess.run(["./cli.py", "product-show", "Firefox"])
+    assert True
 
 def test_cli_product_add(client):
-    rv = cli.product_add("Fake", "en-CA,en-US", True)
-    expected = b'<?xml version="1.0" encoding="utf-8"?><products><product id="4563" name="Fake"><language locale="en-CA"/><language locale="en-US"/></product></products>'
-    msm._reset_db()
-    assert expected == rv
+    subprocess.run(["./cli.py", "product-add", "Test123", "en-GB,en-US", "True"])
+    assert True
 
-
-def test_cli_product_delete_id(client):
-    rv = cli.product_delete(None, "4556")
-    expected = b'<?xml version="1.0" encoding="utf-8"?><success>SUCCESS: product has been deleted</success>'
-    msm._reset_db()
-    assert expected == rv
-
-
-def test_cli_product_delete_name_no_match(client):
-    rv = cli.product_delete("Fake", None)
-    expected = b'<?xml version="1.0" encoding="utf-8"?><error number="102">No product found.</error>'
-    assert expected == rv
-
-
-def test_cli_product_delete_name(client):
-    rv = cli.product_delete("AaronProduct", None)
-    expected = b'<?xml version="1.0" encoding="utf-8"?><success>SUCCESS: product has been deleted</success>'
-    msm._reset_db()
-    assert expected == rv
-
+def test_cli_product_delete(client):
+    subprocess.run(["./cli.py", "product-delete", "AaronProduct"])
+    assert True
 
 def test_cli_product_language_add(client):
-    rv = cli.product_language_add("AaronProduct", "fr-FR,es-SP")
-    expected = b'<?xml version="1.0" encoding="utf-8"?><products><product id="4556" name="AaronProduct"><language locale="en-CA"/><language locale="en-GB"/><language locale="en-US"/><language locale="es-SP"/><language locale="fr-FR"/></product></products>'
-    msm._reset_db()
-    assert expected == rv
-
-
-def test_cli_product_language_add_no_match(client):
-    rv = cli.product_language_add("Fake", "fr-Fr,es-SP")
-    expected = b'<?xml version="1.0" encoding="utf-8"?><error number="102">Product not found.</error>'
-    assert expected == rv
-
+    subprocess.run(["./cli.py", "product-languag-add", "Test123", "en-GB,en-US"])
+    assert True
 
 def test_cli_product_language_delete(client):
-    rv = cli.product_language_delete("AaronProduct", "en-GB,en-US")
-    expected = b'<?xml version="1.0" encoding="utf-8"?><success>SUCCESS: language has been deleted</success>'
-    msm._reset_db()
-    assert expected == rv
+    subprocess.run(["./cli.py", "product-language-delete", "AaronProduct", "*"])
+    assert True
 
-
-def test_cli_product_language_delete_star(client):
-    rv = cli.product_language_delete("AaronProduct", "*")
-    expected = b'<?xml version="1.0" encoding="utf-8"?><success>SUCCESS: language has been deleted</success>'
-    msm._reset_db()
-    assert expected == rv
-
-
-def test_cli_product_language_delete_no_match(client):
-    rv = cli.product_language_delete("Fake", "fr-FR,es-SP")
-    expected = b'<?xml version="1.0" encoding="utf-8"?><error number="102">Product not found.</error>'
-    assert expected == rv
-
-
-def test_cli_create_update_alias_no_product_match(client):
-    rv = cli.create_update_alias("aaron-product", "FakeProduct")
-    expected = b'<?xml version="1.0" encoding="utf-8"?><error number="103">You must specify a valid product to match with an alias</error>'
-    assert expected == rv
-
-
-def test_cli_create_update_alias_alias_product_name_collision(client):
-    rv = cli.create_update_alias("Firefox", "AaronProduct")
-    expected = b'<?xml version="1.0" encoding="utf-8"?><error number="104">You cannot create an alias with the same name as a product</error>'
-    assert expected == rv
-
+def test_cli_uptake(client):
+    subprocess.run(["./cli.py", "uptake", "AaronProduct", "osx"])
+    assert True
 
 def test_cli_create_update_alias(client):
-    rv = cli.create_update_alias("aaron-product", "AaronProduct")
-    expected = b'<?xml version="1.0" encoding="utf-8"?><success>Created/updated alias aaron-product</success>'
-    msm._reset_db()
-    assert expected == rv
+    subprocess.run(["./cli.py", "create-update-alias", "aaronproduct", "AaronProduct"])
+    assert True
 
-
-def test_cli_function_exists(client):
-    subprocess.run(["./cli.py", "location_add"])
-    subprocess.run(["./cli.py", "location_modify"])
-    subprocess.run(["./cli.py", "location_delete"])
-    subprocess.run(["./cli.py", "product_show"])
-    subprocess.run(["./cli.py", "product_add"])
-    subprocess.run(["./cli.py", "product_delete"])
-    subprocess.run(["./cli.py", "product_language_add"])
-    subprocess.run(["./cli.py", "product_language_delete"])
-    subprocess.run(["./cli.py", "uptake"])
-    subprocess.run(["./cli.py", "create_update_alias"])
-
+def test_cli_mirror_list(client):
+    subprocess.run(["./cli.py", "mirror-list"])
     assert True
 
 
-def test_cli_usage(client):
-    subprocess.run(["./cli.py", "location_add", "-h"])
-    subprocess.run(["./cli.py", "location_modify", "-h"])
-    subprocess.run(["./cli.py", "location_delete", "-h"])
-    subprocess.run(["./cli.py", "product_show", "-h"])
-    subprocess.run(["./cli.py", "product_add", "-h"])
-    subprocess.run(["./cli.py", "product_delete", "-h"])
-    subprocess.run(["./cli.py", "product_language_add", "-h"])
-    subprocess.run(["./cli.py", "product_language_delete", "-h"])
-    subprocess.run(["./cli.py", "uptake", "-h"])
-    subprocess.run(["./cli.py", "create_update_alias", "-h"])
-    subprocess.run(["./cli.py", "mirror_list", "-h"])
+def test_cli_help(client):
+    subprocess.run(["./cli.py", "location-add", "--help"])
+    subprocess.run(["./cli.py", "location-modify", "-help"])
+    subprocess.run(["./cli.py", "location-delete", "-help"])
+    subprocess.run(["./cli.py", "location-show", "-help"])
+    subprocess.run(["./cli.py", "product-show", "-help"])
+    subprocess.run(["./cli.py", "product-add", "-help"])
+    subprocess.run(["./cli.py", "product-delete", "-help"])
+    subprocess.run(["./cli.py", "product-language_add", "-help"])
+    subprocess.run(["./cli.py", "product-language_delete", "-help"])
+    subprocess.run(["./cli.py", "uptake", "-help"])
+    subprocess.run(["./cli.py", "create-update-alias", "-help"])
+    subprocess.run(["./cli.py", "mirror-list", "-help"])
 
     assert True
