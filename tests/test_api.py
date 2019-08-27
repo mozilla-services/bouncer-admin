@@ -377,49 +377,61 @@ def test_content_length_limit(client):
     expected = b'<?xml version="1.0" encoding="utf-8"?><error number="101">POST request length exceeded 500KB</error>'
     assert expected == rv.data
 
+
 def test_cli_location_show(client):
     subprocess.run(["./cli.py", "location-show", "Firefox"])
     assert True
+
 
 def test_cli_location_add(client):
     subprocess.run(["./cli.py", "location-add", "AaronProduct", "osx", "/test_path"])
     assert True
 
+
 def test_cli_location_modify(client):
     subprocess.run(["./cli.py", "location-modify", "AaronProduct", "osx", "/test_path"])
     assert True
+
 
 def test_cli_location_delete(client):
     subprocess.run(["./cli.py", "location-delete", "23194"])
     assert True
 
+
 def test_cli_product_show(client):
     subprocess.run(["./cli.py", "product-show", "Firefox"])
     assert True
+
 
 def test_cli_product_add(client):
     subprocess.run(["./cli.py", "product-add", "Test123", "en-GB,en-US", "True"])
     assert True
 
+
 def test_cli_product_delete(client):
     subprocess.run(["./cli.py", "product-delete", "AaronProduct"])
     assert True
+
 
 def test_cli_product_language_add(client):
     subprocess.run(["./cli.py", "product-languag-add", "Test123", "en-GB,en-US"])
     assert True
 
+
 def test_cli_product_language_delete(client):
     subprocess.run(["./cli.py", "product-language-delete", "AaronProduct", "*"])
     assert True
+
 
 def test_cli_uptake(client):
     subprocess.run(["./cli.py", "uptake", "AaronProduct", "osx"])
     assert True
 
+
 def test_cli_create_update_alias(client):
     subprocess.run(["./cli.py", "create-update-alias", "aaronproduct", "AaronProduct"])
     assert True
+
 
 def test_cli_mirror_list(client):
     subprocess.run(["./cli.py", "mirror-list"])
