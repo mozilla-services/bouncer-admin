@@ -86,6 +86,7 @@ jobs:
           name: Test Code
           command: |
             sudo pip3 install --no-cache -r requirements.txt
+            python3 main.py &
             pytest -vv
       - run:
           name: Bouncerscript Test
@@ -107,6 +108,7 @@ jobs:
       - run:
           name: PyTest Cover
           command: |
+            python3 main.py &
             pytest --cov-fail-under=88 --cov=./ --cov-report=xml
       - codecov/upload:
           file: ./coverage.xml
