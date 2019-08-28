@@ -1,16 +1,14 @@
 #!/usr/bin/env python3
-import os, click, base64, requests, urllib3
+import os, click, requests
 import xml.dom.minidom
-
-base_url = os.environ.get("NAZGUL_PATH", "http://localhost:5000")
-username = os.environ.get("NAZGUL_USER", "admin")
-password = os.environ.get("NAZGUL_PASS", "admin")
 
 
 @click.group()
-@click.option("--host", default=base_url, show_default=True)
-@click.option("--username", default=username, show_default=True)
-@click.option("--password", default=password, show_default=True)
+@click.option(
+    "--host", envvar="NAZGUL_PATH", default="http://localhost:5000", show_default=True
+)
+@click.option("--username", envvar="NAZGUL_USER", default="admin", show_default=True)
+@click.option("--password", envvar="NAZGUL_PASS", default="admin", show_default=True)
 @click.pass_context
 def main(ctx, **kwargs):
     ctx.obj = dict(**kwargs)
@@ -28,23 +26,20 @@ def cli_out(data):
 def mirror_list(ctx):
     r = requests.get(ctx["host"] + "/api/mirror_list/")
     cli_out(r.text)
-    return r.text
 
 
 @main.command()
 @click.pass_obj
 @click.argument("product")
 @click.option(
-    "-f",
-    "--fuzzy",
-    default=False,
-    is_flag=True,
+    "--fuzzy/--no-fuzzy",
+    "fuzzy",
+    show_default=True,
     help="True = find similar product names, False = exact match of product name",
 )
 def location_show(ctx, **kwargs):
     r = requests.get(ctx["host"] + "/api/location_show/", params=dict(**kwargs))
     cli_out(r.text)
-    return r.text
 
 
 @main.command()
@@ -59,7 +54,6 @@ def location_add(ctx, **kwargs):
         auth=requests.auth.HTTPBasicAuth(ctx["username"], ctx["password"]),
     )
     cli_out(r.text)
-    return r.text
 
 
 @main.command()
@@ -74,7 +68,6 @@ def location_modify(ctx, **kwargs):
         auth=requests.auth.HTTPBasicAuth(ctx["username"], ctx["password"]),
     )
     cli_out(r.text)
-    return r.text
 
 
 @main.command()
@@ -87,23 +80,20 @@ def location_delete(ctx, **kwargs):
         auth=requests.auth.HTTPBasicAuth(ctx["username"], ctx["password"]),
     )
     cli_out(r.text)
-    return r.text
 
 
 @main.command()
 @click.pass_obj
 @click.argument("product")
 @click.option(
-    "-f",
-    "--fuzzy",
-    default=False,
-    is_flag=True,
+    "--fuzzy/--no-fuzzy",
+    "fuzzy",
+    show_default=True,
     help="True = find similar product names, False = exact match of product name",
 )
 def product_show(ctx, **kwargs):
     r = requests.get(ctx["host"] + "/api/product_show/", params=dict(**kwargs))
     cli_out(r.text)
-    return r.text
 
 
 @main.command()
@@ -119,7 +109,6 @@ def product_add(ctx, **kwargs):
         auth=requests.auth.HTTPBasicAuth(ctx["username"], ctx["password"]),
     )
     cli_out(r.text)
-    return r.text
 
 
 @main.command()
@@ -137,7 +126,6 @@ def product_delete(ctx, **kwargs):
         auth=requests.auth.HTTPBasicAuth(ctx["username"], ctx["password"]),
     )
     cli_out(r.text)
-    return r.text
 
 
 @main.command()
@@ -152,7 +140,6 @@ def product_language_add(ctx, **kwargs):
         auth=requests.auth.HTTPBasicAuth(ctx["username"], ctx["password"]),
     )
     cli_out(r.text)
-    return r.text
 
 
 @main.command()
@@ -168,7 +155,6 @@ def product_language_delete(ctx, **kwargs):
         auth=requests.auth.HTTPBasicAuth(ctx["username"], ctx["password"]),
     )
     cli_out(r.text)
-    return r.data
 
 
 @main.command()
@@ -176,16 +162,14 @@ def product_language_delete(ctx, **kwargs):
 @click.argument("product")
 @click.argument("os")
 @click.option(
-    "-f",
-    "--fuzzy",
-    default=False,
-    is_flag=True,
+    "--fuzzy/--no-fuzzy",
+    "fuzzy",
+    show_default=True,
     help="True = find similar product names, False = exact match of product name",
 )
 def uptake(ctx, **kwargs):
     r = requests.get(ctx["host"] + "/api/uptake/", params=dict(**kwargs))
     cli_out(r.text)
-    return r.text
 
 
 @main.command()
@@ -195,7 +179,6 @@ def uptake(ctx, **kwargs):
 def create_update_alias(ctx, **kwargs):
     r = requests.get(ctx["host"] + "/api/uptake/", params=dict(**kwargs))
     cli_out(r.text)
-    return r.text
 
 
 if __name__ == "__main__":
