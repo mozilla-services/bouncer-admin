@@ -119,10 +119,9 @@ def location_add():
     os = request.form.get("os", None)
     path = request.form.get("path", None)
     if not (product and os and path):
-        data = xml.error(
-            "product, os, and path are required POST parameters.", errno=101
+        raise XMLApiError(
+            "product, os, and path are required POST parameters.", 400, 101
         )
-        return Response(data, mimetype="text/xml"), 400
 
     try:
         res = msm.location_add(product, os, path)
@@ -167,8 +166,7 @@ def location_delete():
 
     location_id = request.form.get("location_id", None)
     if not location_id:
-        data = xml.error("location_id is required.", errno=101)
-        return Response(data, mimetype="text/xml"), 400
+        raise XMLApiError("location_id is required.", 400, 101)
 
     try:
         res = msm.location_delete(location_id)
