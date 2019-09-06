@@ -17,12 +17,12 @@ STATIC_ENDPOINTS = [
     ("/", b"Nazgul"),
     ("/__heartbeat__", b"OK"),
     ("/__lbheartbeat__", b"OK"),
-    ("/api", b"Nazgul API"),
+    ("/api/", b"Nazgul API"),
 ]
 
 
 @pytest.mark.parametrize("endpoint,expected", STATIC_ENDPOINTS)
-def test_static_endpoints(endpoint, expected):
+def test_static_endpoints(client, endpoint, expected):
     rv = client.get(endpoint)
     assert expected == rv.data
 
