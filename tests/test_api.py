@@ -13,6 +13,20 @@ test_pass = "test"
 os.environ["AUTH_USERS"] = '{"' + test_user + '":"' + test_pass + '"}'
 
 
+STATIC_ENDPOINTS = [
+    ("/", b"Nazgul"),
+    ("/__heartbeat__", b"OK"),
+    ("/__lbheartbeat__", b"OK"),
+    ("/api/", b"Nazgul API"),
+]
+
+
+@pytest.mark.parametrize("endpoint,expected", STATIC_ENDPOINTS)
+def test_static_endpoints(client, endpoint, expected):
+    rv = client.get(endpoint)
+    assert expected == rv.data
+
+
 def test_location_show_exact_match(client):
     rv = client.get(
         "/api/location_show/?product=Firefox",
