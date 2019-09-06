@@ -17,7 +17,7 @@ STATIC_ENDPOINTS = [
     ("/", b"Nazgul"),
     ("/__heartbeat__", b"OK"),
     ("/__lbheartbeat__", b"OK"),
-    ("/api/", b"Nazgul API"),
+    ("/api", b"Nazgul API"),
 ]
 
 
