@@ -21,7 +21,7 @@ STATIC_ENDPOINTS = [
 ]
 
 
-@pytest.mark.parameterize("endpoint,expected", STATIC_ENDPOINTS)
+@pytest.mark.parametrize("endpoint,expected", STATIC_ENDPOINTS)
 def test_static_endpoints(endpoint, expected):
     rv = client.get(endpoint)
     assert expected == rv.data
