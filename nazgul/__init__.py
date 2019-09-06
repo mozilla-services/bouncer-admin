@@ -25,5 +25,6 @@ def create_app(test_config=None):
 
     app.config["MAX_CONTENT_LENGTH"] = 500 * 1024
     app.register_blueprint(api.bp)
+    app.register_blueprint(api.hb)
 
     return app
