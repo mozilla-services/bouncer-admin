@@ -38,7 +38,7 @@ class XMLApiError(Exception):
         Exception.__init__(self)
         self.status_code = status_code
         self.message = message
-        self.errno = 0
+        self.errno = errno
 
 
 @bp.errorhandler(XMLApiError)
