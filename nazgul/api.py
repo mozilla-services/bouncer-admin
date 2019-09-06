@@ -305,7 +305,7 @@ def uptake():
     xml.prepare_uptake_fake(products=res["product_names"], oses=res["os_names"])
     data = xml.render()
 
-    return Response(data, mimetype="text/xml"), status
+    return Response(data, mimetype="text/xml"), 200
 
 
 @bp.route("/create_update_alias/", methods=["POST"])
@@ -329,4 +329,4 @@ def create_update_alias():
 
     data = xml.success(res)
 
-    return Response(data, mimetype="text/xml"), status
+    return Response(data, mimetype="text/xml"), 200
