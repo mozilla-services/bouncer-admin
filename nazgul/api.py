@@ -33,6 +33,21 @@ fh.setLevel(logging.DEBUG)
 logger.addHandler(fh)
 
 
+class XMLApiError(Exception):
+    def __init__(self, message, status_code, errno=0):
+        Exception.__init__(self)
+        self.status_code = status_code
+        self.message = message
+        self.errno = errno
+
+
+@bp.errorhandler(XMLApiError)
+def handle_xml_api_error(error):
+    xml = xmlrenderer.XMLRenderer()
+    data = xml.error(error.message, errno=error.errno)
+    return Response(data, mimetype="text/xml"), error.status_code
+
+
 @bp.errorhandler(413)
 def request_entity_too_large(error):
     xml = xmlrenderer.XMLRenderer()
@@ -83,22 +98,15 @@ def location_show():
     product = request.args.get("product")
     fuzzy = request.args.get("fuzzy", "").lower() == "true"
     if product is None:
-        data = xml.error("The GET parameter product is required", errno=103)
-        return Response(data, mimetype="text/xml"), 400
+        raise XMLApiError("The GET parameter product is required", 400, 103)
 
-    try:
-        # product, locations = msm.location_show(product, fuzzy)
-        products = msm.product_show(product, fuzzy)
-        for product in products:
-            locations = msm.get_locations(product["id"])
-            xml.prepare_locations(product, locations)
-        data = xml.render()
-        status = 200
-    except Exception:
-        data = xml.error("Unknown error")
-        status = 500
+    products = msm.product_show(product, fuzzy)
 
-    return Response(data, mimetype="text/xml"), status
+    for product in products:
+        locations = msm.get_locations(product["id"])
+        xml.prepare_locations(product, locations)
+    data = xml.render()
+    return Response(data, mimetype="text/xml"), 200
 
 
 @bp.route("/location_add/", methods=["POST"])
@@ -111,26 +119,21 @@ def location_add():
     os = request.form.get("os", None)
     path = request.form.get("path", None)
     if not (product and os and path):
-        data = xml.error(
-            "product, os, and path are required POST parameters.", errno=101
+        raise XMLApiError(
+            "product, os, and path are required POST parameters.", 400, 101
         )
-        return Response(data, mimetype="text/xml"), 400
 
     try:
         res = msm.location_add(product, os, path)
-        for p in res:
-            prod = {"id": p["id"], "name": p["name"]}
-            xml.prepare_locations(prod, p["locations"])
-        data = xml.render()
-        status = 200
     except ModelError as e:
-        data = xml.error(e.message, errno=e.errno)
-        status = 400
-    except Exception:
-        data = xml.error("Unknown error")
-        status = 500
+        raise XMLApiError(e.message, 400, e.errno)
 
-    return Response(data, mimetype="text/xml"), status
+    for p in res:
+        prod = {"id": p["id"], "name": p["name"]}
+        xml.prepare_locations(prod, p["locations"])
+    data = xml.render()
+
+    return Response(data, mimetype="text/xml"), 200
 
 
 @bp.route("/location_modify/", methods=["POST"])
@@ -144,19 +147,15 @@ def location_modify():
     path = request.form.get("path", None)
     try:
         res = msm.location_modify(product, os, path)
-        for p in res:
-            prod = {"id": p["id"], "name": p["name"]}
-            xml.prepare_locations(prod, p["locations"])
-        data = xml.render()
-        status = 200
     except ModelError as e:
-        data = xml.error(e.message, errno=e.errno)
-        status = 400
-    except Exception:
-        data = xml.error("Unknown error")
-        status = 500
+        raise XMLApiError(e.message, 400, e.errno)
 
-    return Response(data, mimetype="text/xml"), status
+    for p in res:
+        prod = {"id": p["id"], "name": p["name"]}
+        xml.prepare_locations(prod, p["locations"])
+    data = xml.render()
+
+    return Response(data, mimetype="text/xml"), 200
 
 
 @bp.route("/location_delete/", methods=["POST"])
@@ -167,20 +166,15 @@ def location_delete():
 
     location_id = request.form.get("location_id", None)
     if not location_id:
-        data = xml.error("location_id is required.", errno=101)
-        return Response(data, mimetype="text/xml"), 400
+        raise XMLApiError("location_id is required.", 400, 101)
 
     try:
         res = msm.location_delete(location_id)
-        data = xml.success(res)
-        status = 200
     except ModelError as e:
-        data = xml.error(e.message, errno=e.errno)
-        status = 400
-    except Exception:
-        data = xml.error("Unknown error")
-        status = 500
-    return Response(data, mimetype="text/xml"), status
+        raise XMLApiError(e.message, 400, e.errno)
+
+    data = xml.success(res)
+    return Response(data, mimetype="text/xml"), 200
 
 
 @bp.route("/product_show/", methods=["GET"])
@@ -190,16 +184,12 @@ def product_show():
 
     product = request.args.get("product")
     fuzzy = request.args.get("fuzzy", "").lower() == "true"
-    try:
-        res = msm.product_show(product, fuzzy)
-        xml.prepare_products(res)
-        data = xml.render()
-        status = 200
-    except Exception:
-        data = xml.error("Unknown error")
-        status = 500
 
-    return Response(data, mimetype="text/xml"), status
+    res = msm.product_show(product, fuzzy)
+    xml.prepare_products(res)
+    data = xml.render()
+
+    return Response(data, mimetype="text/xml"), 200
 
 
 @bp.route("/product_add/", methods=["POST"])
@@ -213,17 +203,13 @@ def product_add():
     ssl_only = request.form.get("ssl_only", "").lower() == "true"
     try:
         res = msm.product_add(product, languages, ssl_only)
-        xml.prepare_products(res)
-        data = xml.render()
-        status = 200
     except ModelError as e:
-        data = xml.error(e.message, errno=e.errno)
-        status = 400
-    except Exception:
-        data = xml.error("Unknown error")
-        status = 500
+        raise XMLApiError(e.message, 400, e.errno)
 
-    return Response(data, mimetype="text/xml"), status
+    xml.prepare_products(res)
+    data = xml.render()
+
+    return Response(data, mimetype="text/xml"), 200
 
 
 @bp.route("/product_delete/", methods=["POST"])
@@ -240,16 +226,12 @@ def product_delete():
             res = msm.product_delete_id(product_id)
         else:
             res = msm.product_delete_name(product)
-        data = xml.success(res)
-        status = 200
     except ModelError as e:
-        data = xml.error(e.message, errno=e.errno)
-        status = 400
-    except Exception:
-        data = xml.error("Unknown error")
-        status = 500
+        raise XMLApiError(e.message, 400, e.errno)
 
-    return Response(data, mimetype="text/xml"), status
+    data = xml.success(res)
+
+    return Response(data, mimetype="text/xml"), 200
 
 
 @bp.route("/product_language_add/", methods=["POST"])
@@ -262,16 +244,13 @@ def product_language_add():
     languages = request.form.getlist("languages", None)
     try:
         res = msm.product_language_add(product, languages)
-        xml.prepare_products(res)
-        data = xml.render()
-        status = 200
     except ModelError as e:
-        data = xml.error(e.message, errno=e.errno)
-        status = 400
-    except Exception:
-        data = xml.error("Unknown error")
-        status = 500
-    return Response(data, mimetype="text/xml"), status
+        raise XMLApiError(e.message, 400, e.errno)
+
+    xml.prepare_products(res)
+    data = xml.render()
+
+    return Response(data, mimetype="text/xml"), 200
 
 
 @bp.route("/product_language_delete/", methods=["POST"])
@@ -284,15 +263,12 @@ def product_language_delete():
     languages = request.form.getlist("languages", None)
     try:
         res = msm.product_language_delete(product, languages)
-        data = xml.success(res)
-        status = 200
     except ModelError as e:
-        data = xml.error(e.message, errno=e.errno)
-        status = 400
-    except Exception:
-        data = xml.error("Unknown error")
-        status = 500
-    return Response(data, mimetype="text/xml"), status
+        raise XMLApiError(e.message, 400, e.errno)
+
+    data = xml.success(res)
+
+    return Response(data, mimetype="text/xml"), 200
 
 
 @bp.route("/mirror_list/", methods=["GET"])
@@ -303,6 +279,7 @@ def mirror_list():
     res = msm.mirror_list()
     xml.prepare_mirrors(res)
     data = xml.render()
+
     return Response(data, mimetype="text/xml"), 200
 
 
@@ -315,22 +292,18 @@ def uptake():
     os = request.args.get("os")
     fuzzy = request.args.get("fuzzy", "").lower() == "true"
     if product is None and os is None:
-        data = xml.error("product and/or os are required GET parameters.", errno=101)
-        return Response(data, mimetype="text/xml"), 400
+        raise XMLApiError("product and/or os are required GET parameters.", 400, 101)
 
     try:
         res = msm.uptake(product, os, fuzzy)
-        xml.prepare_uptake_fake(products=res["product_names"], oses=res["os_names"])
-        data = xml.render()
-        status = 200
     except ModelError as e:
         # Error no. for /uptake is always 102 in Tuxedo (Should this be changed in Nazgul?)
-        data = xml.error(e.message, errno=102)
-        status = 400
-    except Exception:
-        data = xml.error("Unknown error")
-        status = 500
-    return Response(data, mimetype="text/xml"), status
+        raise XMLApiError(e.message, 400, 102)
+
+    xml.prepare_uptake_fake(products=res["product_names"], oses=res["os_names"])
+    data = xml.render()
+
+    return Response(data, mimetype="text/xml"), 200
 
 
 @bp.route("/create_update_alias/", methods=["POST"])
@@ -343,20 +316,15 @@ def create_update_alias():
     related_product = request.form.get("related_product", None)
 
     if not alias:
-        data = xml.error("Alias name not provided", errno=102)
-        return Response(data, mimetype="text/xml"), 400
+        raise XMLApiError("Alias name not provided", 400, 102)
     if not related_product:
-        data = xml.error("Related product name not provided", errno=103)
-        return Response(data, mimetype="text/xml"), 400
+        raise XMLApiError("Related product name not provided", 400, 103)
 
     try:
         res = msm.create_update_alias(alias, related_product)
-        data = xml.success(res)
-        status = 200
     except ModelError as e:
-        data = xml.error(e.message, errno=e.errno)
-        status = 400
-    except Exception:
-        data = xml.error("Unknown error")
-        status = 500
-    return Response(data, mimetype="text/xml"), status
+        raise XMLApiError(e.message, 400, e.errno)
+
+    data = xml.success(res)
+
+    return Response(data, mimetype="text/xml"), 200
