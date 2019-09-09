@@ -18,7 +18,7 @@ if [ $status -ne 0 ]; then
 fi
 
 # Run nazgul in new container
-docker run --name local-nazgul --rm -p 5000:5000 nazgul
+docker run --name local-nazgul --rm -p 8000:8000 nazgul
 status=$?
 if [ $status -ne 0 ]; then
     exit $status
