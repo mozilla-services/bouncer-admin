@@ -169,11 +169,11 @@ def location_delete():
         raise XMLApiError("location_id is required.", 400, 101)
 
     try:
-        res = msm.location_delete(location_id)
+        msm.location_delete(location_id)
     except ModelError as e:
         raise XMLApiError(e.message, 400, e.errno)
 
-    data = xml.success(res)
+    data = xml.success("SUCCESS: location has been deleted")
     return Response(data, mimetype="text/xml"), 200
 
 
@@ -223,13 +223,13 @@ def product_delete():
 
     try:
         if product is None:
-            res = msm.product_delete_id(product_id)
+            msm.product_delete_id(product_id)
         else:
-            res = msm.product_delete_name(product)
+            msm.product_delete_name(product)
     except ModelError as e:
         raise XMLApiError(e.message, 400, e.errno)
 
-    data = xml.success(res)
+    data = xml.success("SUCCESS: product has been deleted")
 
     return Response(data, mimetype="text/xml"), 200
 
@@ -262,11 +262,11 @@ def product_language_delete():
     product = request.form.get("product", None)
     languages = request.form.getlist("languages", None)
     try:
-        res = msm.product_language_delete(product, languages)
+        msm.product_language_delete(product, languages)
     except ModelError as e:
         raise XMLApiError(e.message, 400, e.errno)
 
-    data = xml.success(res)
+    data = xml.success("SUCCESS: language has been deleted")
 
     return Response(data, mimetype="text/xml"), 200
 
@@ -321,10 +321,10 @@ def create_update_alias():
         raise XMLApiError("Related product name not provided", 400, 103)
 
     try:
-        res = msm.create_update_alias(alias, related_product)
+        msm.create_update_alias(alias, related_product)
     except ModelError as e:
         raise XMLApiError(e.message, 400, e.errno)
 
-    data = xml.success(res)
+    data = xml.success(f"Created/updated alias {alias}")
 
     return Response(data, mimetype="text/xml"), 200

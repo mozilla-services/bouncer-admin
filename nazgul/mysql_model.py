@@ -97,8 +97,6 @@ class MySQLModel:
 
         cur.close()
 
-        return "SUCCESS: location has been deleted"
-
     def product_show(self, product, fuzzy):
         if fuzzy:
             sql = """SELECT id FROM mirror_products WHERE name LIKE %s;"""
@@ -163,8 +161,6 @@ class MySQLModel:
 
         cur.close()
 
-        return "SUCCESS: product has been deleted"
-
     def product_delete_id(self, id):
         cur = self._get_cursor()
 
@@ -180,8 +176,6 @@ class MySQLModel:
         self._db.commit()
 
         cur.close()
-
-        return "SUCCESS: product has been deleted"
 
     def product_language_add(self, product, languages):
         product_exists, product_id = self.product_exists(product)
@@ -219,8 +213,6 @@ class MySQLModel:
         self._db.commit()
 
         cur.close()
-
-        return "SUCCESS: language has been deleted"
 
     def mirror_list(self):
         cur = self._get_cursor()
@@ -300,8 +292,6 @@ class MySQLModel:
         self._db.commit()
 
         cur.close()
-
-        return "Created/updated alias " + alias
 
     def os_exists(self, os):
         sql = """SELECT id FROM mirror_os WHERE name=%s;"""
