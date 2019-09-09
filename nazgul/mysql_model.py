@@ -14,9 +14,6 @@ class MySQLModel:
         # TODO: Should I have autocommit always True?
         self._db = mysql.connector.connect(**self.db_config)
 
-    def index(self):
-        return "Welcome to Nazgul"
-
     def get_locations(self, product):
         sql = """SELECT ml.id, ml.path, mo.name FROM mirror_locations ml JOIN mirror_os mo ON ml.os_id=mo.id WHERE product_id=%s;"""
 
