@@ -1,12 +1,14 @@
-from flask import Flask, render_template, request, Response, Blueprint
+import os
+import time
+import logging
+import json
+
+from flask import request, Response, Blueprint
 from flask_httpauth import HTTPBasicAuth
 from werkzeug.security import generate_password_hash, check_password_hash
-from functools import wraps
 
-from nazgul.mysql_model import MySQLModel, ModelError
-import nazgul.xmlrenderer as xmlrenderer
-import urllib.parse
-import os, time, logging, json
+from .mysql_model import MySQLModel, ModelError
+from . import xmlrenderer
 
 bp = Blueprint("api", __name__, url_prefix="/api")
 hb = Blueprint("heartbeat", __name__)

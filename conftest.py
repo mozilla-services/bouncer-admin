@@ -4,7 +4,7 @@ import tempfile
 import pytest
 
 import sys, os
-from nazgul import create_app
+from nazgul import create_test_app
 
 
 @pytest.fixture
