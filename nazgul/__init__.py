@@ -2,11 +2,11 @@ import os
 
 from flask import Flask
 
+from . import api
 
-def create_app(test_config=None):
-    # create and configure the app
-    app = Flask(__name__, instance_relative_config=True)
 
+def create_test_app(test_config=None):
+    app = create_app()
     if test_config is None:
         # load the instance config, if it exists, when not testing
         app.config.from_pyfile("config.py", silent=True)
@@ -21,10 +21,15 @@ def create_app(test_config=None):
     except OSError:
         pass
 
-    from . import api, mysql_model, xmlrenderer
+    return app
 
-    app.config["MAX_CONTENT_LENGTH"] = 500 * 1024
+
+def create_app():
+    # create and configure the app
+    app = Flask(__name__, instance_relative_config=True)
     app.register_blueprint(api.bp)
     app.register_blueprint(api.hb)
+    app.url_map.strict_slashes = True
+    app.config["MAX_CONTENT_LENGTH"] = 500 * 1024
 
     return app

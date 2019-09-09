@@ -9,7 +9,7 @@ from nazgul import create_app
 
 @pytest.fixture
 def client():
-    app = create_app()
+    app = create_test_app()
     db_fd, app.config["DATABASE"] = tempfile.mkstemp()
     app.config["TESTING"] = True
     client = app.test_client()
