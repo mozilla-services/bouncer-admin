@@ -169,11 +169,19 @@ def location_delete():
         raise XMLApiError("location_id is required.", 400, 101)
 
     try:
+<<<<<<< HEAD
         msm.location_delete(location_id)
     except ModelError as e:
         raise XMLApiError(e.message, 400, e.errno)
 
     data = xml.success("SUCCESS: location has been deleted")
+=======
+        res = msm.location_delete(location_id)
+    except ModelError as e:
+        raise XMLApiError(e.message, 400, e.errno)
+
+    data = xml.success(res)
+>>>>>>> origin/master
     return Response(data, mimetype="text/xml"), 200
 
 
@@ -225,11 +233,19 @@ def product_delete():
         if product is None:
             msm.product_delete_id(product_id)
         else:
+<<<<<<< HEAD
             msm.product_delete_name(product)
     except ModelError as e:
         raise XMLApiError(e.message, 400, e.errno)
 
     data = xml.success("SUCCESS: product has been deleted")
+=======
+            res = msm.product_delete_name(product)
+    except ModelError as e:
+        raise XMLApiError(e.message, 400, e.errno)
+
+    data = xml.success(res)
+>>>>>>> origin/master
 
     return Response(data, mimetype="text/xml"), 200
 
@@ -262,11 +278,19 @@ def product_language_delete():
     product = request.form.get("product", None)
     languages = request.form.getlist("languages", None)
     try:
+<<<<<<< HEAD
         msm.product_language_delete(product, languages)
     except ModelError as e:
         raise XMLApiError(e.message, 400, e.errno)
 
     data = xml.success("SUCCESS: language has been deleted")
+=======
+        res = msm.product_language_delete(product, languages)
+    except ModelError as e:
+        raise XMLApiError(e.message, 400, e.errno)
+
+    data = xml.success(res)
+>>>>>>> origin/master
 
     return Response(data, mimetype="text/xml"), 200
 
@@ -321,10 +345,18 @@ def create_update_alias():
         raise XMLApiError("Related product name not provided", 400, 103)
 
     try:
+<<<<<<< HEAD
         msm.create_update_alias(alias, related_product)
     except ModelError as e:
         raise XMLApiError(e.message, 400, e.errno)
 
     data = xml.success(f"Created/updated alias {alias}")
+=======
+        res = msm.create_update_alias(alias, related_product)
+    except ModelError as e:
+        raise XMLApiError(e.message, 400, e.errno)
+
+    data = xml.success(res)
+>>>>>>> origin/master
 
     return Response(data, mimetype="text/xml"), 200
