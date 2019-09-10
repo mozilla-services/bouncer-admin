@@ -3,10 +3,11 @@ import time
 import logging
 import json
 
-from flask import request, Response, Blueprint
+from flask import request, Response, Blueprint, g, current_app
 from flask_httpauth import HTTPBasicAuth
 from werkzeug.security import generate_password_hash, check_password_hash
 
+from .db import get_db
 from .mysql_model import MySQLModel, ModelError
 from . import xmlrenderer
 
@@ -14,19 +15,6 @@ bp = Blueprint("api", __name__, url_prefix="/api")
 hb = Blueprint("heartbeat", __name__)
 
 auth = HTTPBasicAuth()
-
-usr_imp = {}
-if "AUTH_USERS" in os.environ:
-    usr_imp = json.loads(os.environ["AUTH_USERS"])
-
-users = dict()
-for usr in usr_imp:
-    users[usr] = generate_password_hash(usr_imp[usr])
-
-test_db = os.environ.get("DATABASE_URL", "127.0.0.1")
-username = os.environ.get("DB_USER", "root")
-password = os.environ.get("DB_PASS", "")
-msm = MySQLModel(host=test_db, user=username, password=password)
 
 # Setup logging
 logger = logging.getLogger("nazgul")
@@ -36,6 +24,17 @@ fh = logging.FileHandler("nazgul.log")
 fh.setLevel(logging.DEBUG)
 
 logger.addHandler(fh)
+
+
+def get_users():
+    if "users" not in g:
+        users = {}
+        for user, password in json.loads(current_app.config["AUTH_USERS"]).items():
+            users[user] = generate_password_hash(password)
+
+        g.users = users
+
+    return g.users
 
 
 class XMLApiError(Exception):
@@ -62,6 +61,7 @@ def request_entity_too_large(error):
 
 @auth.verify_password
 def verify_password(username, password):
+    users = get_users()
     if username in users:
         logger.info(
             "{0} - {1} - {2} - {3}".format(
@@ -105,10 +105,10 @@ def location_show():
     if product is None:
         raise XMLApiError("The GET parameter product is required", 400, 103)
 
-    products = msm.product_show(product, fuzzy)
+    products = get_db().product_show(product, fuzzy)
 
     for product in products:
-        locations = msm.get_locations(product["id"])
+        locations = get_db().get_locations(product["id"])
         xml.prepare_locations(product, locations)
     data = xml.render()
     return Response(data, mimetype="text/xml"), 200
@@ -129,7 +129,7 @@ def location_add():
         )
 
     try:
-        res = msm.location_add(product, os, path)
+        res = get_db().location_add(product, os, path)
     except ModelError as e:
         raise XMLApiError(e.message, 400, e.errno)
 
@@ -151,7 +151,7 @@ def location_modify():
     os = request.form.get("os", None)
     path = request.form.get("path", None)
     try:
-        res = msm.location_modify(product, os, path)
+        res = get_db().location_modify(product, os, path)
     except ModelError as e:
         raise XMLApiError(e.message, 400, e.errno)
 
@@ -174,7 +174,7 @@ def location_delete():
         raise XMLApiError("location_id is required.", 400, 101)
 
     try:
-        msm.location_delete(location_id)
+        get_db().location_delete(location_id)
     except ModelError as e:
         raise XMLApiError(e.message, 400, e.errno)
 
@@ -190,7 +190,7 @@ def product_show():
     product = request.args.get("product")
     fuzzy = request.args.get("fuzzy", "").lower() == "true"
 
-    res = msm.product_show(product, fuzzy)
+    res = get_db().product_show(product, fuzzy)
     xml.prepare_products(res)
     data = xml.render()
 
@@ -207,7 +207,7 @@ def product_add():
     languages = request.form.getlist("languages", None)
     ssl_only = request.form.get("ssl_only", "").lower() == "true"
     try:
-        res = msm.product_add(product, languages, ssl_only)
+        res = get_db().product_add(product, languages, ssl_only)
     except ModelError as e:
         raise XMLApiError(e.message, 400, e.errno)
 
@@ -228,9 +228,9 @@ def product_delete():
 
     try:
         if product is None:
-            msm.product_delete_id(product_id)
+            get_db().product_delete_id(product_id)
         else:
-            msm.product_delete_name(product)
+            get_db().product_delete_name(product)
     except ModelError as e:
         raise XMLApiError(e.message, 400, e.errno)
 
@@ -248,7 +248,7 @@ def product_language_add():
     product = request.form.get("product", None)
     languages = request.form.getlist("languages", None)
     try:
-        res = msm.product_language_add(product, languages)
+        res = get_db().product_language_add(product, languages)
     except ModelError as e:
         raise XMLApiError(e.message, 400, e.errno)
 
@@ -267,7 +267,7 @@ def product_language_delete():
     product = request.form.get("product", None)
     languages = request.form.getlist("languages", None)
     try:
-        msm.product_language_delete(product, languages)
+        get_db().product_language_delete(product, languages)
     except ModelError as e:
         raise XMLApiError(e.message, 400, e.errno)
 
@@ -281,7 +281,7 @@ def product_language_delete():
 def mirror_list():
     xml = xmlrenderer.XMLRenderer()
 
-    res = msm.mirror_list()
+    res = get_db().mirror_list()
     xml.prepare_mirrors(res)
     data = xml.render()
 
@@ -300,7 +300,7 @@ def uptake():
         raise XMLApiError("product and/or os are required GET parameters.", 400, 101)
 
     try:
-        res = msm.uptake(product, os, fuzzy)
+        res = get_db().uptake(product, os, fuzzy)
     except ModelError as e:
         # Error no. for /uptake is always 102 in Tuxedo (Should this be changed in Nazgul?)
         raise XMLApiError(e.message, 400, 102)
@@ -326,7 +326,7 @@ def create_update_alias():
         raise XMLApiError("Related product name not provided", 400, 103)
 
     try:
-        msm.create_update_alias(alias, related_product)
+        get_db().create_update_alias(alias, related_product)
     except ModelError as e:
         raise XMLApiError(e.message, 400, e.errno)
 
