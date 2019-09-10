@@ -4,9 +4,14 @@ import os
 from flask import Flask
 
 
+DEFAULT_ADDR = "0.0.0.0"  # nosec
+
+
 def run_server():
     app = create_app()
-    app.run(host="0.0.0.0", port=os.environ.get("PORT", 8000))
+    app.run(
+        host=os.environ.get("ADDR", DEFAULT_ADDR), port=os.environ.get("PORT", 8000)
+    )
 
 
 def create_test_app(test_config=None):
