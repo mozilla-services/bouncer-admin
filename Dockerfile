@@ -16,4 +16,4 @@ COPY . /app
 
 RUN python setup.py install
 
-CMD ["python3", "main.py"]
+CMD ["nazgul"]

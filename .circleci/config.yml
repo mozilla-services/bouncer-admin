@@ -86,15 +86,14 @@ jobs:
           name: Test Code
           command: |
             sudo pip3 install --no-cache -r requirements.txt
-            python3 setup.py install
-            AUTH_USERS='{"admin": "admin"}' python3 main.py &
+            sudo python3 setup.py install
+            AUTH_USERS='{"admin": "admin"}' nazgul &
             pytest -vv
       - run:
           name: Bouncerscript Test
           command: |
             sudo pip3 install https://github.com/AmanuelAaron/bouncerscript/archive/server-integration-test.zip
-            python3 setup.py install
-            AUTH_USERS='{"admin": "admin"}' python3 main.py &
+            AUTH_USERS='{"admin": "admin"}' nazgul &
             bouncerscript bouncerscript_config.json
       - run:
           name: Bouncerscript Test w/ Production Payload
@@ -102,14 +101,12 @@ jobs:
             sudo mkdir /usr/local/lib/python3.7/site-packages/bouncerscript/work_dir
             sudo mkdir /usr/local/lib/python3.7/site-packages/bouncerscript/artifact_dir
             sudo cp bouncerscript_prod_task.json /usr/local/lib/python3.7/site-packages/bouncerscript/work_dir/task.json
-            python3 setup.py install
-            AUTH_USERS='{"admin": "admin"}' python3 main.py &
+            AUTH_USERS='{"admin": "admin"}' nazgul &
             bouncerscript bouncerscript_prod_config.json
       - run:
           name: PyTest Cover
           command: |
-            python3 setup.py install
-            python3 main.py &
+            nazgul &
             pytest --cov-fail-under=88 --cov=./ --cov-report=xml
       - codecov/upload:
           file: ./coverage.xml

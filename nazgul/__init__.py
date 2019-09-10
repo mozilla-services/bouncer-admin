@@ -4,6 +4,11 @@ import os
 from flask import Flask
 
 
+def run_server():
+    app = create_app()
+    app.run(host="0.0.0.0", port=os.environ.get("PORT", 8000))
+
+
 def create_test_app(test_config=None):
     app = create_app()
     if test_config is None:
