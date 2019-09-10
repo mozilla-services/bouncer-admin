@@ -15,7 +15,10 @@ hb = Blueprint("heartbeat", __name__)
 
 auth = HTTPBasicAuth()
 
-usr_imp = json.loads(os.environ.get("AUTH_USERS", '{"admin":"admin"}'))
+usr_imp = {}
+if "AUTH_USERS" in os.environ:
+    usr_imp = json.loads(os.environ["AUTH_USERS"])
+
 users = dict()
 for usr in usr_imp:
     users[usr] = generate_password_hash(usr_imp[usr])
