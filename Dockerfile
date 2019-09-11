@@ -1,5 +1,8 @@
 FROM python:3.7-stretch
 
+RUN groupadd --gid 10001 app && \
+    useradd -g app --uid 10001 --shell /usr/sbin/nologin --create-home --home-dir /app app
+
 WORKDIR /app
 
 EXPOSE 8000
@@ -16,4 +19,6 @@ COPY . /app
 
 RUN python setup.py install
 
-CMD ["nazgul"]
+USER app
+
+CMD ["./run"]

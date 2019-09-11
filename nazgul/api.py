@@ -20,10 +20,10 @@ auth = HTTPBasicAuth()
 logger = logging.getLogger("nazgul")
 logger.setLevel(logging.DEBUG)
 
-fh = logging.FileHandler("nazgul.log")
-fh.setLevel(logging.DEBUG)
+stream_handler = logging.StreamHandler()
+stream_handler.setLevel(logging.DEBUG)
 
-logger.addHandler(fh)
+logger.addHandler(stream_handler)
 
 
 def get_users():
