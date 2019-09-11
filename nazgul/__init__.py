@@ -1,12 +1,21 @@
+import json
 import os
 
 from flask import Flask
 
 
-def create_app(test_config=None):
-    # create and configure the app
-    app = Flask(__name__, instance_relative_config=True)
+DEFAULT_ADDR = "0.0.0.0"  # nosec
 
+
+def run_server():
+    app = create_app()
+    app.run(
+        host=os.environ.get("ADDR", DEFAULT_ADDR), port=os.environ.get("PORT", 8000)
+    )
+
+
+def create_test_app(test_config=None):
+    app = create_app()
     if test_config is None:
         # load the instance config, if it exists, when not testing
         app.config.from_pyfile("config.py", silent=True)
@@ -21,10 +30,36 @@ def create_app(test_config=None):
     except OSError:
         pass
 
-    from . import api, mysql_model, xmlrenderer
+    return app
 
-    app.config["MAX_CONTENT_LENGTH"] = 500 * 1024
+
+def init_sentry(dsn):
+    import sentry_sdk
+    from sentry_sdk.integrations.flask import FlaskIntegration
+
+    sentry_sdk.init(dsn=dsn, integrations=[FlaskIntegration()])
+
+
+def create_app():
+    if "SENTRY_DSN" in os.environ:
+        init_sentry(os.environ["SENTRY_DSN"])
+
+    # create and configure the app
+    app = Flask(__name__, instance_relative_config=True)
+
+    from . import api
+
     app.register_blueprint(api.bp)
     app.register_blueprint(api.hb)
+
+    app.url_map.strict_slashes = True
+
+    app.config["MAX_CONTENT_LENGTH"] = 500 * 1024
+
+    app.config["DATABASE_URL"] = os.environ.get("DATABASE_URL", "127.0.0.1")
+    app.config["DB_USER"] = os.environ.get("DB_USER", "root")
+    app.config["DB_PASS"] = os.environ.get("DB_PASS", "")
+
+    app.config["AUTH_USERS"] = os.environ.get("AUTH_USERS", "{}")
 
     return app

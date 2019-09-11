@@ -5,7 +5,7 @@ import xml.dom.minidom
 
 @click.group()
 @click.option(
-    "--host", envvar="NAZGUL_PATH", default="http://localhost:5000", show_default=True
+    "--host", envvar="NAZGUL_PATH", default="http://localhost:8000", show_default=True
 )
 @click.option("--username", envvar="NAZGUL_USER", default="admin", show_default=True)
 @click.option("--password", envvar="NAZGUL_PASS", default="admin", show_default=True)
