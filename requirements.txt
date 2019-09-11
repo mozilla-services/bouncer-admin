@@ -136,3 +136,5 @@ uWSGI==2.0.18 \
 sentry-sdk[flask]==0.11.2 \
     --hash=sha256:528f936118679e9a52dacb96bfefe20acb5d63e0797856c64a582cc3c2bc1f9e \
     --hash=sha256:b4edcb1296fee107439345d0f8b23432b8732b7e28407f928367d0a4a36301a9
+blinker==1.4 \
+    --hash=sha256:471aee25f3992bd325afa3772f1063dbdbbca947a041b8b89466dc00d606f8b6
