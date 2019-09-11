@@ -2,8 +2,7 @@
 
 set -o errexit -o nounset
 
-
 exec uwsgi \
-    --socket "0.0.0.0:${PORT:-8000}" \
+    --http-socket "0.0.0.0:${PORT:-8000}" \
     --manage-script-name \
     --module "nazgul:create_app()"
