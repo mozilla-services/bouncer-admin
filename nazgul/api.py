@@ -85,6 +85,11 @@ def heartbeat():
     return Response("OK", mimetype="text/plain")
 
 
+@hb.route("/__error__")
+def trigger_error():
+    division_by_zero = 1 / 0
+
+
 @hb.route("/__lbheartbeat__", methods=["GET"])
 def lbheartbeat():
     return Response("OK", mimetype="text/plain")

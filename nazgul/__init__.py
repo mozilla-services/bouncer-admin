@@ -33,7 +33,17 @@ def create_test_app(test_config=None):
     return app
 
 
+def init_sentry(dsn):
+    import sentry_sdk
+    from sentry_sdk.integrations.flask import FlaskIntegration
+
+    sentry_sdk.init(dsn=dsn, integrations=[FlaskIntegration()])
+
+
 def create_app():
+    if "SENTRY_DSN" in os.environ:
+        init_sentry(os.environ["SENTRY_DSN"])
+
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
 
