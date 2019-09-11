@@ -14,7 +14,10 @@ class MySQLModel:
         self._db = mysql.connector.connect(**self.db_config)
 
     def get_locations(self, product):
-        sql = """SELECT ml.id, ml.path, mo.name FROM mirror_locations ml JOIN mirror_os mo ON ml.os_id=mo.id WHERE product_id=%s;"""
+        sql = """SELECT ml.id, ml.path, mo.name
+                 FROM mirror_locations ml
+                 JOIN mirror_os mo ON ml.os_id=mo.id
+                 WHERE product_id=%s;"""
 
         cur = self._get_cursor()
         cur.execute(sql, (product,))
@@ -320,7 +323,11 @@ class MySQLModel:
             return False, []
 
     def location_exists(self, os, product):
-        sql = """SELECT ml.id FROM mirror_locations ml JOIN mirror_os mo ON ml.os_id=mo.id JOIN mirror_products mp ON ml.product_id=mp.id WHERE mo.name=%s AND mp.name=%s;"""
+        sql = """SELECT ml.id
+                 FROM mirror_locations ml
+                 JOIN mirror_os mo ON ml.os_id=mo.id
+                 JOIN mirror_products mp ON ml.product_id=mp.id
+                 WHERE mo.name=%s AND mp.name=%s;"""
 
         cur = self._get_cursor()
         cur.execute(sql, (os, product))
@@ -362,7 +369,10 @@ class MySQLModel:
         return len(res) > 0
 
     def get_products_info(self, ids):
-        sql = """SELECT mp.id, mp.name, mpl.language FROM mirror_products mp JOIN mirror_product_langs mpl ON mp.id=mpl.product_id WHERE mp.id=%s"""
+        sql = """SELECT mp.id, mp.name, mpl.language
+                 FROM mirror_products mp
+                 JOIN mirror_product_langs mpl ON mp.id=mpl.product_id
+                 WHERE mp.id=%s"""
 
         cur = self._get_cursor()
         products = []
@@ -383,7 +393,11 @@ class MySQLModel:
         return products
 
     def get_locations_info(self, ids):
-        sql = """SELECT ml.id, ml.product_id, mp.name, path, mo.name FROM mirror_locations ml JOIN mirror_products mp ON ml.product_id=mp.id JOIN mirror_os mo ON mo.id=ml.os_id WHERE mp.id=%s"""
+        sql = """SELECT ml.id, ml.product_id, mp.name, path, mo.name
+                 FROM mirror_locations ml
+                 JOIN mirror_products mp ON ml.product_id=mp.id
+                 JOIN mirror_os mo ON mo.id=ml.os_id
+                 WHERE mp.id=%s"""
 
         cur = self._get_cursor()
         products = []
