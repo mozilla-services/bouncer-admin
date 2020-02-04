@@ -390,8 +390,6 @@ class MySQLModel:
             raise ModelError(
                 "FAILED: mirror_product.id='" + id + "' does not exist", 102
             )
-        if not res:
-            return None
 
         return {
             "id": res[0][0],
