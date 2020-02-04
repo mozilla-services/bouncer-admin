@@ -369,7 +369,7 @@ class MySQLModel:
         return len(res) > 0
 
     def get_product_languages(self, id_):
-        sql = "SELECT language FROM mirror_product_languages WHERE product_id=%s"
+        sql = "SELECT language FROM mirror_product_langs WHERE product_id=%s"
         cur = self._get_cursor()
         cur.execute(sql, (id_,))
         languages = []
