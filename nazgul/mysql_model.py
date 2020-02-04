@@ -368,29 +368,38 @@ class MySQLModel:
 
         return len(res) > 0
 
-    def get_products_info(self, ids):
-        sql = """SELECT mp.id, mp.name, mpl.language
+    def get_product_languages(self, id_):
+        sql = "SELECT language FROM mirror_product_langs WHERE product_id=%s"
+        cur = self._get_cursor()
+        cur.execute(sql, (id_,))
+        languages = []
+        for row in cur.fetchall():
+            languages.append(row[0])
+
+        return languages
+
+    def get_product_info(self, id_):
+        sql = """SELECT mp.id, mp.name
                  FROM mirror_products mp
-                 JOIN mirror_product_langs mpl ON mp.id=mpl.product_id
                  WHERE mp.id=%s"""
 
         cur = self._get_cursor()
-        products = []
-        for id in ids:
-            cur.execute(sql, (id,))
-            res = cur.fetchall()
-            if res == []:
-                continue
-            prod = {"id": res[0][0], "name": res[0][1]}
-            languages = []
-            for line in res:
-                languages.append(line[2])
+        cur.execute(sql, (id_,))
+        res = cur.fetchall()
+        if len(res) != 1:
+            raise ModelError(
+                "FAILED: mirror_product.id='" + id_ + "' does not exist", 102
+            )
 
-            prod["languages"] = languages
+        return {
+            "id": res[0][0],
+            "name": res[0][1],
+            "languages": self.get_product_languages(id_),
+        }
 
-            products.append(prod)
-
-        return products
+    def get_products_info(self, ids):
+        products = [self.get_product_info(id_) for id_ in ids]
+        return [x for x in products if x is not None]
 
     def get_locations_info(self, ids):
         sql = """SELECT ml.id, ml.product_id, mp.name, path, mo.name
@@ -401,8 +410,8 @@ class MySQLModel:
 
         cur = self._get_cursor()
         products = []
-        for id in ids:
-            cur.execute(sql, (id,))
+        for id_ in ids:
+            cur.execute(sql, (id_,))
             res = cur.fetchall()
             if res == []:
                 continue
