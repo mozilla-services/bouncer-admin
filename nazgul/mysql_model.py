@@ -9,7 +9,7 @@ class MySQLModel:
             "password": password,
             "host": host,
             "autocommit": True,
-            "ssl_disabled": True, # MySQL 5.6 only supports TLS 1.0
+            "ssl_disabled": True,  # MySQL 5.6 only supports TLS 1.0
         }
         # TODO: Should I have autocommit always True?
         self._db = mysql.connector.connect(**self.db_config)
