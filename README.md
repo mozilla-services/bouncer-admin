@@ -2,12 +2,17 @@
 The admin interface for https://github.com/mozilla-services/go-bouncer/.
 
 ---
-#### Requirements
+## Requirements
 |         |            |
 | ------------- |:-------------:|
  | docker | 18.09.2 |
 | mysql  | 5.6     |
 ---
+
+### Updating Requirements
+
+To update all requirements: `hashin -u`
+
 ## How to get started
 
 ```sh app.sh MYSQL_LOGIN```
