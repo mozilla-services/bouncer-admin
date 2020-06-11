@@ -1,6 +1,6 @@
 import json
 import os
-import log_utils
+from . import log_utils
 
 log_utils.configure_logging()
 
