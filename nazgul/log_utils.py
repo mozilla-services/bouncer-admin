@@ -55,11 +55,10 @@ class JsonLogFormatter(logging.Formatter):
         )
 
         fields = dict()
-
-        if record.args:
-            fields["msg"] = record.getMessage()
-        else:
+        if isinstance(record.msg, dict):
             fields = record.msg
+        else:
+            fields["msg"] = record.getMessage()
 
         if has_request_context():
             request_details = {}

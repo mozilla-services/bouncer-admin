@@ -18,6 +18,11 @@ hb = Blueprint("heartbeat", __name__)
 auth = HTTPBasicAuth()
 
 
+@bp.before_app_request
+def log_request():
+    current_app.logger.info("request")
+
+
 def get_users():
     if "users" not in g:
         users = {}
