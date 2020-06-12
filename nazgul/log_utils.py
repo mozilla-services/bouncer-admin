@@ -65,7 +65,7 @@ class JsonLogFormatter(logging.Formatter):
             fields["url"] = request.url
             fields["method"] = request.method
             fields["user"] = request.remote_user
-            fields["agent"] = request.user_agent
+            fields["agent"] = request.user_agent.string
 
         out["Fields"] = fields
 
