@@ -1,5 +1,8 @@
 import json
 import os
+from . import log_utils
+
+log_utils.configure_logging()
 
 from flask import Flask
 

@@ -10,20 +10,12 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from .db import get_db
 from .mysql_model import MySQLModel, ModelError
 from . import xmlrenderer
+from . import log_utils
 
 bp = Blueprint("api", __name__, url_prefix="/api")
 hb = Blueprint("heartbeat", __name__)
 
 auth = HTTPBasicAuth()
-
-# Setup logging
-logger = logging.getLogger("nazgul")
-logger.setLevel(logging.DEBUG)
-
-stream_handler = logging.StreamHandler()
-stream_handler.setLevel(logging.DEBUG)
-
-logger.addHandler(stream_handler)
 
 
 def get_users():
@@ -61,17 +53,14 @@ def request_entity_too_large(error):
 
 @auth.verify_password
 def verify_password(username, password):
-    users = get_users()
-    if username in users:
-        logger.info(
-            "{0} - {1} - {2} - {3}".format(
-                time.strftime("%m/%d/%Y %H:%M:%S"),
-                request.remote_addr,
-                username,
-                request.full_path,
-            )
-        )
-        return check_password_hash(users.get(username), password)
+    user = get_users().get(username)
+
+    if user and check_password_hash(user, password):
+        current_app.logger.info({"user": username, "msg": "authenticated successfully"})
+        return True
+
+    current_app.logger.info({"user": username, "msg": "authentication failed"})
+
     return False
 
 
@@ -155,6 +144,12 @@ def location_modify():
     product = request.form.get("product", None)
     os = request.form.get("os", None)
     path = request.form.get("path", None)
+
+    if not (product and os and path):
+        raise XMLApiError(
+            "product, os, and path are required POST parameters.", 400, 101
+        )
+
     try:
         res = get_db().location_modify(product, os, path)
     except ModelError as e:
