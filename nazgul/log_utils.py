@@ -62,10 +62,18 @@ class JsonLogFormatter(logging.Formatter):
             fields = record.msg
 
         if has_request_context():
-            fields["url"] = request.url
-            fields["method"] = request.method
-            fields["user"] = request.remote_user
-            fields["agent"] = request.user_agent.string
+            request_details = {}
+            request_details["url"] = request.url
+            request_details["method"] = request.method
+            request_details["user"] = (
+                request.authorization.get("username")
+                if request.authorization
+                else "anonymous"
+            )
+            request_details["agent"] = request.user_agent.string
+            if request.form:
+                request_details["params"] = request.form
+            fields["request"] = request_details
 
         out["Fields"] = fields
 

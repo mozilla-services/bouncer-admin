@@ -144,6 +144,12 @@ def location_modify():
     product = request.form.get("product", None)
     os = request.form.get("os", None)
     path = request.form.get("path", None)
+
+    if not (product and os and path):
+        raise XMLApiError(
+            "product, os, and path are required POST parameters.", 400, 101
+        )
+
     try:
         res = get_db().location_modify(product, os, path)
     except ModelError as e:
