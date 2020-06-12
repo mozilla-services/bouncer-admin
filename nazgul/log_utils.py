@@ -72,6 +72,8 @@ class JsonLogFormatter(logging.Formatter):
             request_details["agent"] = request.user_agent.string
             if request.form:
                 request_details["params"] = request.form
+            if request.args:
+                request_details["args"] = request.args
             fields["request"] = request_details
 
         out["Fields"] = fields
