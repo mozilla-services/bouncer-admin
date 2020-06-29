@@ -16,9 +16,12 @@ def main(ctx, **kwargs):
 
 
 def cli_out(data):
-    dom = xml.dom.minidom.parseString(data)
-    pretty_xml = dom.toprettyxml()
-    print(pretty_xml)
+    try:
+        dom = xml.dom.minidom.parseString(data)
+        pretty_xml = dom.toprettyxml()
+        print(pretty_xml)
+    except:
+        print(data)
 
 
 @main.command()
@@ -177,7 +180,11 @@ def uptake(ctx, **kwargs):
 @click.argument("alias")
 @click.argument("related_product")
 def create_update_alias(ctx, **kwargs):
-    r = requests.get(ctx["host"] + "/api/uptake/", params=dict(**kwargs))
+    r = requests.post(
+        ctx["host"] + "/api/create_update_alias/",
+        data=dict(**kwargs),
+        auth=requests.auth.HTTPBasicAuth(ctx["username"], ctx["password"]),
+    )
     cli_out(r.text)
 
 
