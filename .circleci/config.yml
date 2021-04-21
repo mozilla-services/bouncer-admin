@@ -5,8 +5,6 @@
 # DOCKER_PASS
 #
 version: 2.1
-orbs:
-  codecov: codecov/codecov@1.0.2
 jobs:
   style:
     docker:
@@ -103,14 +101,6 @@ jobs:
             sudo cp bouncerscript_prod_task.json /usr/local/lib/python3.7/site-packages/bouncerscript/work_dir/task.json
             AUTH_USERS='{"admin": "admin"}' nazgul &
             bouncerscript bouncerscript_prod_config.json
-      - run:
-          name: PyTest Cover
-          command: |
-            nazgul &
-            pytest --cov-fail-under=88 --cov=./ --cov-report=xml
-      - codecov/upload:
-          file: ./coverage.xml
-
 
 
   deploy:
