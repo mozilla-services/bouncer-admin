@@ -13,7 +13,7 @@ jobs:
       - checkout
       - run:
           name: Install black
-          command: pip install black==19.3b0
+          command: pip install black
       - run:
           name: Black Python
           command: black --diff --check .
