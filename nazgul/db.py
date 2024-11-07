@@ -9,5 +9,6 @@ def get_db():
             host=current_app.config["DATABASE_URL"],
             user=current_app.config["DB_USER"],
             password=current_app.config["DB_PASS"],
+            db=current_app.config["DB_NAME"],
         )
     return g.db

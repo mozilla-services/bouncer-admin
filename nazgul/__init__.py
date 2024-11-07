@@ -62,6 +62,7 @@ def create_app():
     app.config["DATABASE_URL"] = os.environ.get("DATABASE_URL", "127.0.0.1")
     app.config["DB_USER"] = os.environ.get("DB_USER", "root")
     app.config["DB_PASS"] = os.environ.get("DB_PASS", "")
+    app.config["DB_NAME"] = os.environ.get("DB_NAME", "bouncer")
 
     app.config["AUTH_USERS"] = os.environ.get("AUTH_USERS", "{}")
 
