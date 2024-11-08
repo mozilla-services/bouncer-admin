@@ -213,22 +213,6 @@ class MySQLModel:
 
         cur.close()
 
-    def mirror_list(self):
-        cur = self._get_cursor()
-
-        sql = """SELECT baseurl FROM mirror_mirrors WHERE active=1"""
-        cur.execute(sql)
-
-        res = cur.fetchall()
-
-        mirrors = []
-        for line in res:
-            mirrors.append({"baseurl": line[0]})
-
-        cur.close()
-
-        return mirrors
-
     def uptake(self, product, os, fuzzy):
         cur = self._get_cursor()
 

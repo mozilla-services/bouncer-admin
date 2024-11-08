@@ -281,18 +281,6 @@ def product_language_delete():
     return Response(data, mimetype="text/xml"), 200
 
 
-@bp.route("/mirror_list/", methods=["GET"])
-@bp.route("/mirror_list", methods=["GET"])
-def mirror_list():
-    xml = xmlrenderer.XMLRenderer()
-
-    res = get_db().mirror_list()
-    xml.prepare_mirrors(res)
-    data = xml.render()
-
-    return Response(data, mimetype="text/xml"), 200
-
-
 @bp.route("/uptake/", methods=["GET"])
 @bp.route("/uptake", methods=["GET"])
 def uptake():

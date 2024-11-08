@@ -72,15 +72,6 @@ def test_uptake(client):
     assert expected == rv.data
 
 
-def test_mirror_list(client):
-    rv = client.get(
-        "api/mirror_list/",
-        headers={"Authorization": requests.auth._basic_auth_str(test_user, test_pass)},
-    )
-    expected = b'<?xml version="1.0" encoding="utf-8"?><mirrors><mirror baseurl="http://download-installer.cdn.mozilla.net/pub"/><mirror baseurl="https://download-installer.cdn.mozilla.net/pub"/></mirrors>'
-    assert expected == rv.data
-
-
 def test_location_add_product_not_found(client):
     rv = client.post(
         "api/location_add/",
@@ -444,11 +435,6 @@ def test_cli_uptake(client):
 
 def test_cli_create_update_alias(client):
     subprocess.run(["./cli.py", "create-update-alias", "aaronproduct", "AaronProduct"])
-    assert True
-
-
-def test_cli_mirror_list(client):
-    subprocess.run(["./cli.py", "mirror-list"])
     assert True
 
 
