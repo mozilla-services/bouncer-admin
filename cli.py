@@ -26,13 +26,6 @@ def cli_out(data):
 
 @main.command()
 @click.pass_obj
-def mirror_list(ctx):
-    r = requests.get(ctx["host"] + "/api/mirror_list/")
-    cli_out(r.text)
-
-
-@main.command()
-@click.pass_obj
 @click.argument("product")
 @click.option(
     "--fuzzy/--no-fuzzy",
