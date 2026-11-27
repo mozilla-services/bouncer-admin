@@ -2,30 +2,29 @@ version: 2.1
 jobs:
   style:
     docker:
-      - image: python:3
+      - image: cimg/python:3.14
     steps:
       - checkout
       - run:
           name: Install black
-          command: pip install black
+          command: python -m pip install black==26.10.1
       - run:
           name: Black Python
-          command: black --diff --check .
+          command: python -m black --diff --check .
   security:
     docker:
-      - image: python:3
+      - image: cimg/python:3.14
     steps:
       - checkout
       - run:
           name: Install bandit
-          command: pip install bandit==1.6.2
+          command: python -m pip install bandit==1.9.4
       - run:
           name: Bandit Security Check
-          command: bandit -r -ll nazgul/
+          command: python -m bandit -r -ll nazgul/
   build:
     docker:
-      - image: docker:stable-git
-    working_directory: /dockerflow
+      - image: cimg/base:2026.11
     steps:
       - checkout
       - setup_remote_docker
