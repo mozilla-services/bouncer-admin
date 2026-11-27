@@ -2,6 +2,7 @@
     "work_dir": "fixtures",
     "verbose": true,
     "taskcluster_scope_prefix": "project:releng:bouncer:",
+    "require_successive_versions": true,
     "bouncer_config": {
         "project:releng:bouncer:server:staging": {
             "api_root": "http://127.0.0.1:8000/api",

@@ -82,10 +82,9 @@ jobs:
 
             python -m venv "$test_dir/bouncerscript"
             bouncerscript_bin="$test_dir/bouncerscript/bin"
-            "$bouncerscript_bin/python" -m pip install https://github.com/AmanuelAaron/bouncerscript/archive/server-integration-test.zip
-            bouncerscript_package=$("$bouncerscript_bin/python" -c 'from pathlib import Path; import bouncerscript; print(Path(bouncerscript.__file__).parent)')
+            "$bouncerscript_bin/python" -m pip install "bouncerscript @ git+https://github.com/mozilla-releng/scriptworker-scripts#subdirectory=bouncerscript"
             mkdir -p "$test_dir/fixtures" "$test_dir/work_dir" "$test_dir/artifact_dir"
-            cp "$bouncerscript_package/test/test_work_dir/task.json" "$test_dir/fixtures/task.json"
+            cp bouncerscript_task.json "$test_dir/fixtures/task.json"
             cp bouncerscript_prod_task.json "$test_dir/work_dir/task.json"
             cp bouncerscript_config.json bouncerscript_prod_config.json "$test_dir/"
             cd "$test_dir"
