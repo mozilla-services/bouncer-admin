@@ -1,4 +1,4 @@
-FROM python:3.8
+FROM python:3.14
 
 RUN groupadd --gid 10001 app && \
     useradd -g app --uid 10001 --shell /usr/sbin/nologin --create-home --home-dir /app app
@@ -7,8 +7,7 @@ WORKDIR /app
 
 EXPOSE 8000
 
-ENV FLASK_APP nazgul.py
-ENV FLASK_ENV production
+ENV FLASK_APP=nazgul.py
 ENV DATABASE_URL=host.docker.internal
 ENV AUTH_USERS="{}"
 
@@ -17,7 +16,7 @@ RUN pip install --require-hashes --no-cache -r /python_requirements.txt
 
 COPY . /app
 
-RUN python setup.py install
+RUN python -m pip install --no-deps .
 
 USER app
 

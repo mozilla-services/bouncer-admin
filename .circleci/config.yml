@@ -46,7 +46,7 @@ jobs:
 
   test:
     docker:
-      - image: circleci/python:3.7
+      - image: cimg/python:3.14
       - image: cimg/mysql:8.4
         environment:
           MYSQL_DATABASE: bouncer
@@ -65,26 +65,32 @@ jobs:
             done
             echo Failed waiting for MySQL && exit 1
       - run:
-          name: Test Code
+          name: Test API and Bouncerscript
           command: |
-            sudo pip3 install --no-cache -r requirements.txt
-            sudo python3 setup.py install
-            AUTH_USERS='{"admin": "admin"}' nazgul &
-            pytest -vv
-      - run:
-          name: Bouncerscript Test
-          command: |
-            sudo pip3 install https://github.com/AmanuelAaron/bouncerscript/archive/server-integration-test.zip
-            AUTH_USERS='{"admin": "admin"}' nazgul &
-            bouncerscript bouncerscript_config.json
-      - run:
-          name: Bouncerscript Test w/ Production Payload
-          command: |
-            sudo mkdir /usr/local/lib/python3.7/site-packages/bouncerscript/work_dir
-            sudo mkdir /usr/local/lib/python3.7/site-packages/bouncerscript/artifact_dir
-            sudo cp bouncerscript_prod_task.json /usr/local/lib/python3.7/site-packages/bouncerscript/work_dir/task.json
-            AUTH_USERS='{"admin": "admin"}' nazgul &
-            bouncerscript bouncerscript_prod_config.json
+            test_dir=$(mktemp -d)
+            python -m venv "$test_dir/app"
+            source "$test_dir/app/bin/activate"
+            python -m pip install --require-hashes -r requirements.txt
+            python -m pip install --no-deps .
+
+            ADDR=127.0.0.1 AUTH_USERS='{"admin": "admin"}' nazgul &
+            server_pid=$!
+            trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+            curl --fail --silent --show-error --retry 10 --retry-connrefused --retry-delay 1 \
+              http://127.0.0.1:8000/__heartbeat__
+            python -m pytest -vv
+
+            python -m venv "$test_dir/bouncerscript"
+            bouncerscript_bin="$test_dir/bouncerscript/bin"
+            "$bouncerscript_bin/python" -m pip install https://github.com/AmanuelAaron/bouncerscript/archive/server-integration-test.zip
+            bouncerscript_package=$("$bouncerscript_bin/python" -c 'from pathlib import Path; import bouncerscript; print(Path(bouncerscript.__file__).parent)')
+            mkdir -p "$test_dir/fixtures" "$test_dir/work_dir" "$test_dir/artifact_dir"
+            cp "$bouncerscript_package/test/test_work_dir/task.json" "$test_dir/fixtures/task.json"
+            cp bouncerscript_prod_task.json "$test_dir/work_dir/task.json"
+            cp bouncerscript_config.json bouncerscript_prod_config.json "$test_dir/"
+            cd "$test_dir"
+            "$bouncerscript_bin/bouncerscript" bouncerscript_config.json
+            "$bouncerscript_bin/bouncerscript" bouncerscript_prod_config.json
 
 workflows:
   version: 2
