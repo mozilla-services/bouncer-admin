@@ -47,7 +47,7 @@ jobs:
   test:
     docker:
       - image: circleci/python:3.7
-      - image: cimg/mysql:5.7
+      - image: cimg/mysql:8.4
         environment:
           MYSQL_DATABASE: bouncer
     steps:
