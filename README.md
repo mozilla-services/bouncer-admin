@@ -6,6 +6,7 @@ The admin interface for https://github.com/mozilla-services/go-bouncer/.
 |         |            |
 | ------------- |:-------------:|
  | docker | 18.09.2 |
+| Python | 3.14    |
 | mysql  | 8.4     |
 ---
 
