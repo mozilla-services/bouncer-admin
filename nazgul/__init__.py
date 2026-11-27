@@ -6,7 +6,6 @@ log_utils.configure_logging()
 
 from flask import Flask
 
-
 DEFAULT_ADDR = "0.0.0.0"  # nosec
 
 
